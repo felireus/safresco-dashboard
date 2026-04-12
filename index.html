@@ -833,277 +833,77 @@ tr:nth-child(even) td { background: #F4FBF7; }
 
 <!-- ==================== CHART.JS ==================== -->
 
-
 <script>
 // ============================================================
-// GOOGLE SHEETS LIVE DATA SOURCE
-// Reads data from the published Google Sheet every time the
-// dashboard loads (or on manual refresh). No hardcoded rows.
+// EMBEDDED DATASET — full raw rows from Excel source
 // ============================================================
 
-// ── Google Apps Script Web App URL ───────────────────────────
-// Proxy que elimina restricciones CORS — generado desde tu Sheet
+// ============================================================
+// GOOGLE SHEETS — CARGA EN VIVO VIA APPS SCRIPT
+// ============================================================
 const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxDhDIOHkpGXMW8NH2iXXXAR59RgYX1Gqs8EgiTLF0bV54tgdDKsJ7yOJH4Tfoj2V7U/exec';
+let RAW_DATA = [];
 
-// ── Runtime state ────────────────────────────────────────────
-let RAW_DATA = [];          // filled after fetch
-let _dataLoaded = false;    // guard so initDynamic waits
-
-// ── Loading overlay ──────────────────────────────────────────
-function showLoadingOverlay(msg) {
-  let el = document.getElementById('_gsOverlay');
-  if (!el) {
-    el = document.createElement('div');
-    el.id = '_gsOverlay';
-    el.style.cssText = `
-      position:fixed;top:0;left:0;width:100%;height:100%;
-      background:rgba(0,64,38,0.82);z-index:9999;
-      display:flex;flex-direction:column;align-items:center;
-      justify-content:center;gap:14px;
-    `;
-    el.innerHTML = `
-      <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="24" cy="24" r="20" stroke="rgba(255,255,255,0.2)" stroke-width="4"/>
-        <path d="M24 4 A20 20 0 0 1 44 24" stroke="#FFD100" stroke-width="4" stroke-linecap="round">
-          <animateTransform attributeName="transform" type="rotate" from="0 24 24" to="360 24 24" dur="0.9s" repeatCount="indefinite"/>
-        </path>
-      </svg>
-      <div id="_gsMsg" style="color:white;font-family:Arial,sans-serif;font-size:13px;font-weight:700;letter-spacing:0.5px;text-align:center;">${msg}</div>
-      <div id="_gsErr" style="color:#FF9090;font-size:10px;font-family:Arial,sans-serif;max-width:440px;text-align:center;display:none;padding:0 20px;"></div>
-      <button id="_gsRetry" onclick="loadFromSheet()" style="display:none;background:#FFD100;color:#004D26;border:none;padding:6px 18px;border-radius:6px;font-weight:700;font-size:11px;cursor:pointer;margin-top:4px;">🔄 Retry</button>
-    `;
-    document.body.appendChild(el);
-  } else {
-    document.getElementById('_gsMsg').textContent = msg;
-    document.getElementById('_gsErr').style.display = 'none';
-    document.getElementById('_gsRetry').style.display = 'none';
-    el.style.display = 'flex';
+function _showLoadBanner(msg, isError) {
+  let b = document.getElementById('_ldbanner');
+  if (!b) {
+    b = document.createElement('div');
+    b.id = '_ldbanner';
+    b.style.cssText = 'position:fixed;top:0;left:0;width:100%;z-index:9999;padding:10px 16px;font-family:Arial,sans-serif;font-size:12px;font-weight:700;text-align:center;';
+    document.body.appendChild(b);
   }
+  b.style.background = isError ? '#CC0000' : '#006633';
+  b.style.color = 'white';
+  b.textContent = msg;
+  if (!isError) setTimeout(() => { if(b) b.style.display='none'; }, 3000);
 }
 
-function hideLoadingOverlay() {
-  const el = document.getElementById('_gsOverlay');
-  if (el) el.style.display = 'none';
-}
-
-function showOverlayError(errText) {
-  const errEl  = document.getElementById('_gsErr');
-  const retryEl = document.getElementById('_gsRetry');
-  const msgEl  = document.getElementById('_gsMsg');
-  if (msgEl)   msgEl.textContent  = 'Could not load data from Google Sheets';
-  if (errEl)  { errEl.textContent  = errText; errEl.style.display = 'block'; }
-  if (retryEl)  retryEl.style.display = 'inline-block';
-}
-
-// ── Status badge in filter bar ───────────────────────────────
-function setDataStatusBadge(state, detail) {
-  let badge = document.getElementById('_gsBadge');
-  if (!badge) {
-    badge = document.createElement('span');
-    badge.id = '_gsBadge';
-    badge.style.cssText = 'font-size:7.5px;font-weight:700;padding:2px 8px;border-radius:8px;white-space:nowrap;';
-    const fb = document.getElementById('filterBar');
-    if (fb) fb.appendChild(badge);
-  }
-  const styles = {
-    loading: 'background:rgba(255,255,255,0.15);color:#FFD100;border:1px solid rgba(255,209,0,0.4);',
-    ok:      'background:#E8F5EE;color:#004D26;border:1px solid #A0D8B0;',
-    error:   'background:#FFEAEA;color:#CC0000;border:1px solid #FFAAAA;'
+function _mapRow(row) {
+  const fobRaw = String(row['FOB/TON'] || row.FOB || row.fob || '0').replace(/[^0-9,.-]/g,'').replace(',','.');
+  return {
+    client:     String(row.Client     || row.client     || '').trim(),
+    market:     String(row.Market     || row.market     || '').trim(),
+    variety:    String(row.Variety    || row.variety    || '').trim(),
+    subvariety: String(row.Subvariety || row.subvariety || '').trim(),
+    packType:   String(row.Pack_Type  || row.packType   || row.PackType || '').trim(),
+    port:       String(row.Port       || row.port       || '').trim(),
+    packWeek:   parseInt(row.PackWeek || row.packWeek   || 0) || 0,
+    etaWeek:    parseInt(row.ETAWeek  || row.etaWeek    || 0) || 0,
+    size:       String(row['Size Profile'] !== undefined && row['Size Profile'] !== '' ? row['Size Profile'] : (row.Size || row.size || '')).trim(),
+    classCode:  String(row.Class      || row.classCode  || '').trim(),
+    volume:     parseFloat(row.Volume || row.volume     || 0) || 0,
+    status:     String(row.Status     || row.status     || '').trim(),
+    fob:        parseFloat(fobRaw) || 0,
   };
-  badge.style.cssText += styles[state] || styles.loading;
-  badge.textContent = detail;
 }
 
-// ── CSV parser ───────────────────────────────────────────────
-function parseCSV(text) {
-  const lines = text.split('\n').filter(l => l.trim());
-  if (lines.length < 2) return [];
-
-  // Parse a single CSV line respecting quoted fields
-  function parseLine(line) {
-    const result = [];
-    let cur = '', inQ = false;
-    for (let i = 0; i < line.length; i++) {
-      const ch = line[i];
-      if (ch === '"') {
-        if (inQ && line[i+1] === '"') { cur += '"'; i++; }
-        else inQ = !inQ;
-      } else if (ch === ',' && !inQ) {
-        result.push(cur.trim()); cur = '';
-      } else {
-        cur += ch;
-      }
-    }
-    result.push(cur.trim());
-    return result;
-  }
-
-  const headers = parseLine(lines[0]).map(h => h.replace(/^"|"$/g,'').trim());
-
-  // Map header names (flexible — tolerates extra spaces, different case)
-  function col(hdrs, ...names) {
-    for (const n of names) {
-      const idx = hdrs.findIndex(h => h.toLowerCase().replace(/\s+/g,'') === n.toLowerCase().replace(/\s+/g,''));
-      if (idx !== -1) return idx;
-    }
-    return -1;
-  }
-
-  const iClient    = col(headers, 'client');
-  const iMarket    = col(headers, 'market');
-  const iVariety   = col(headers, 'variety');
-  const iSubv      = col(headers, 'subvariety', 'subvar');
-  const iPackType  = col(headers, 'packtype', 'pack_type');
-  const iPort      = col(headers, 'port');
-  const iPackWeek  = col(headers, 'packweek', 'pack_week');
-  const iEtaWeek   = col(headers, 'etaweek', 'eta_week', 'eta');
-  const iSize      = col(headers, 'size');
-  const iClass     = col(headers, 'classcode', 'class', 'class_code');
-  const iVolume    = col(headers, 'volume', 'pallets', 'vol');
-  const iStatus    = col(headers, 'status');
-  const iFob       = col(headers, 'fob', 'fob_usd');
-
-  const rows = [];
-  for (let i = 1; i < lines.length; i++) {
-    const cells = parseLine(lines[i]).map(c => c.replace(/^"|"$/g,''));
-    if (cells.length < 3) continue;
-    const vol = parseFloat((iVolume >= 0 ? cells[iVolume] : '0').replace(',','')) || 0;
-    if (!cells[iClient >= 0 ? iClient : 0]) continue; // skip blank rows
-    rows.push({
-      client:    iClient   >= 0 ? cells[iClient]   : '',
-      market:    iMarket   >= 0 ? cells[iMarket]   : '',
-      variety:   iVariety  >= 0 ? cells[iVariety]  : '',
-      subvariety:iSubv     >= 0 ? cells[iSubv]     : '',
-      packType:  iPackType >= 0 ? cells[iPackType] : '',
-      port:      iPort     >= 0 ? cells[iPort]     : '',
-      packWeek:  parseInt((iPackWeek >= 0 ? cells[iPackWeek] : '0').replace(',','')) || 0,
-      etaWeek:   parseInt((iEtaWeek  >= 0 ? cells[iEtaWeek]  : '0').replace(',','')) || 0,
-      size:      iSize     >= 0 ? cells[iSize]     : '',
-      classCode: iClass    >= 0 ? cells[iClass]    : '',
-      volume:    vol,
-      status:    iStatus   >= 0 ? cells[iStatus]   : '',
-      fob:       parseFloat((iFob >= 0 ? cells[iFob] : '0').replace(',','')) || 0,
-    });
-  }
-  return rows.filter(r => r.volume > 0 || r.client);
-}
-
-// ── Main fetch function ──────────────────────────────────────
 async function loadFromSheet() {
-  showLoadingOverlay('Conectando con Google Sheets…');
-  setDataStatusBadge('loading', '⟳ Cargando…');
-
-  // Apps Script actúa de proxy: devuelve JSON sin restricciones CORS
-  const url = APPS_SCRIPT_URL + '?t=' + Date.now();
-
+  _showLoadBanner('⟳ Cargando datos desde Google Sheets…', false);
   try {
-    const resp = await fetch(url, { cache: 'no-store' });
-
-    if (!resp.ok) {
-      throw new Error(`Error HTTP ${resp.status}. Comprueba que el Apps Script está desplegado correctamente.`);
-    }
-
+    const resp = await fetch(APPS_SCRIPT_URL + '?t=' + Date.now(), { cache: 'no-store' });
+    if (!resp.ok) throw new Error('HTTP ' + resp.status);
     const json = await resp.json();
-
-    if (!Array.isArray(json) || json.length === 0) {
-      throw new Error('El script devolvió datos vacíos. Comprueba que la hoja tiene filas con datos.');
-    }
-
-    // ── Diagnóstico: ver qué claves tiene la primera fila ──
-    const firstRow = json[0];
-    const keys = Object.keys(firstRow);
-    console.log('[SAFRESCO] Columnas recibidas:', keys);
-    console.log('[SAFRESCO] Primera fila:', JSON.stringify(firstRow));
-
-    // Convertir JSON del Apps Script al formato interno del dashboard
-    RAW_DATA = json.map((row, i) => {
-      const client   = String(row.Client     || row.client     || '').trim();
-      const market   = String(row.Market     || row.market     || '').trim();
-      const variety  = String(row.Variety    || row.variety    || '').trim();
-      const subv     = String(row.Subvariety || row.subvariety || '').trim();
-      const packType = String(row.Pack_Type  || row.packType   || row.PackType || '').trim();
-      const port     = String(row.Port       || row.port       || '').trim();
-      const packWeek = parseInt(row.PackWeek || row.packWeek   || 0) || 0;
-      const etaWeek  = parseInt(row.ETAWeek  || row.etaWeek   || 0) || 0;
-      const size     = String(row['Size Profile'] !== undefined ? row['Size Profile'] : (row.Size || row.size || '')).trim();
-      const classCode= String(row.Class      || row.classCode  || '').trim();
-      const volume   = parseFloat(row.Volume || row.volume     || 0) || 0;
-      const status   = String(row.Status     || row.status     || '').trim();
-      const fobRaw   = String(row['FOB/TON'] || row.FOB || row.fob || '0');
-      const fob      = parseFloat(fobRaw.replace(/[^0-9,.-]/g,'').replace(',','.')) || 0;
-
-      if (i < 3) console.log('[SAFRESCO] Fila', i, '→ client:', client, 'volume:', volume, 'packWeek:', packWeek, 'etaWeek:', etaWeek);
-
-      return { client, market, variety, subvariety: subv, packType, port, packWeek, etaWeek, size, classCode, volume, status, fob };
-    }).filter(r => r.client && r.volume > 0);
-
-    console.log('[SAFRESCO] Filas válidas tras filtro:', RAW_DATA.length, 'de', json.length);
-
-    if (RAW_DATA.length === 0) {
-      throw new Error('No se encontraron filas válidas. Verifica que las columnas "client" y "volume" tienen datos.');
-    }
-
-    _dataLoaded = true;
-
-    const ts = new Date().toLocaleTimeString('es-ES', { hour:'2-digit', minute:'2-digit' });
-    setDataStatusBadge('ok', `✓ ${RAW_DATA.length} filas · ${ts}`);
-    hideLoadingOverlay();
-
-    // Arrancar el dashboard — usar requestAnimationFrame para asegurar
-    // que todos los <script> del documento han sido evaluados
-    function tryInit() {
-      if (typeof initDynamic === 'function') {
-        initDynamic();
-      } else {
-        requestAnimationFrame(tryInit);
-      }
-    }
-    tryInit();
-
+    if (!Array.isArray(json) || json.length === 0) throw new Error('Sin datos');
+    RAW_DATA = json.map(_mapRow).filter(r => r.client && r.volume > 0);
+    if (RAW_DATA.length === 0) throw new Error('0 filas válidas');
+    _showLoadBanner('✓ ' + RAW_DATA.length + ' filas cargadas desde Google Sheets', false);
+    // Auto-refresh cada 5 minutos en segundo plano
+    setInterval(async () => {
+      try {
+        const r2 = await fetch(APPS_SCRIPT_URL + '?t=' + Date.now(), { cache: 'no-store' });
+        const j2 = await r2.json();
+        if (Array.isArray(j2) && j2.length > 0) {
+          const mapped = j2.map(_mapRow).filter(r => r.client && r.volume > 0);
+          if (mapped.length > 0) { RAW_DATA = mapped; applyFilter(); }
+        }
+      } catch(e) {}
+    }, 5 * 60 * 1000);
   } catch(err) {
-    setDataStatusBadge('error', '✗ Error al cargar');
-    showOverlayError(err.message || String(err));
-    console.error('[SAFRESCO Dashboard] Sheet load error:', err);
+    _showLoadBanner('✗ Error cargando Google Sheets: ' + err.message + ' — usando datos locales', true);
+    console.error('[SAFRESCO]', err);
   }
 }
 
-// ── Auto-refresh every N minutes ─────────────────────────────
-const AUTO_REFRESH_MINUTES = 5;
-setInterval(() => {
-  if (_dataLoaded) {
-    // Silent background refresh
-    const url = APPS_SCRIPT_URL + '?t=' + Date.now();
-    fetch(url, { cache: 'no-store' })
-      .then(r => r.json())
-      .then(json => {
-        if (!Array.isArray(json) || json.length === 0) return;
-        const mapped = json.map(row => ({
-          client:     String(row.Client     || row.client     || ''),
-          market:     String(row.Market     || row.market     || ''),
-          variety:    String(row.Variety    || row.variety    || ''),
-          subvariety: String(row.Subvariety || row.subvariety || ''),
-          packType:   String(row.Pack_Type  || row.packType   || row.PackType || ''),
-          port:       String(row.Port       || row.port       || ''),
-          packWeek:   parseInt(row.PackWeek || row.packWeek   || 0) || 0,
-          etaWeek:    parseInt(row.ETAWeek  || row.etaWeek    || 0) || 0,
-          size:       String(row['Size Profile'] || row.Size  || row.size || ''),
-          classCode:  String(row.Class      || row.classCode  || ''),
-          volume:     parseFloat(row.Volume || row.volume     || 0) || 0,
-          status:     String(row.Status     || row.status     || ''),
-          fob:        parseFloat(String(row['FOB/TON'] || row.FOB || row.fob || '0').replace(/[^0-9.,]/g,'').replace(',','.')) || 0,
-        })).filter(r => r.client && r.volume > 0);
-        if (mapped.length > 0) {
-          RAW_DATA = mapped;
-          const ts = new Date().toLocaleTimeString('es-ES', { hour:'2-digit', minute:'2-digit' });
-          setDataStatusBadge('ok', `✓ ${mapped.length} filas · ${ts}`);
-          applyFilter();
-        }
-      })
-      .catch(() => {});
-  }
-}, AUTO_REFRESH_MINUTES * 60 * 1000);
-
-</script>
 
 // ============================================================
 // STATE
@@ -2124,22 +1924,12 @@ let currentSize       = '__ALL__';
 // POPULATE FILTER DROPDOWNS from data
 // ============================================================
 function populateFilterDropdowns() {
-  // ── Client selector (built dynamically from live data) ──
-  const clientSel = document.getElementById('clientSelect');
-  if (clientSel) {
-    const prev = clientSel.value;
-    const clients = [...new Set(RAW_DATA.map(r => r.client).filter(c => c))].sort();
-    clientSel.innerHTML = '<option value="__ALL__">All Clients</option>' +
-      clients.map(c => `<option value="${c}"${c===prev?' selected':''}>${c}</option>`).join('');
-  }
-  // ── Subvariety selector ──
   const subvSel = document.getElementById('subvarietySelect');
   if (subvSel) {
     const subvs = [...new Set(RAW_DATA.map(r => r.subvariety).filter(s => s && s !== ''))].sort();
     subvSel.innerHTML = '<option value="__ALL__">All Subvarieties</option>' +
       subvs.map(s => `<option value="${s}">${s}</option>`).join('');
   }
-  // ── Size selector ──
   const sizeSel = document.getElementById('sizeSelect');
   if (sizeSel) {
     const sizes = [...new Set(RAW_DATA.map(r => r.size).filter(s => s && s !== ''))].sort();
@@ -2612,8 +2402,11 @@ new Chart(ctxSZ, {
   }
 });
 
-// ─── Boot: load live data from Google Sheets, then init ───
-window.addEventListener("load", loadFromSheet);
+// ─── Init dynamic engine after static charts are built ───
+window.addEventListener("load", async function() {
+  await loadFromSheet();
+  initDynamic();
+});
 </script>
 </body>
 </html>
