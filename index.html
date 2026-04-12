@@ -1,0 +1,2619 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SAFRESCO | Client Demand Plan 2026 · W14–W41 · Interactive</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 9px;
+  color: #1A1A1A;
+  background: white;
+  padding: 8px 10px 20px 10px;
+}
+/* ===== HEADER ===== */
+.header {
+  background: #006633;
+  padding: 8px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-radius: 4px;
+  margin-bottom: 6px;
+}
+.header-left { display: flex; align-items: center; gap: 10px; }
+.hdr-logo { height: 32px; width: auto; }
+.hdr-title { font-size: 14px; font-weight: 700; color: white; letter-spacing: 0.3px; }
+.hdr-sub { font-size: 8.5px; color: #C8F0D8; margin-top: 2px; }
+.hdr-meta { font-size: 7.5px; color: rgba(255,255,255,0.7); margin-top: 3px; }
+.badge {
+  color: #004D26;
+  font-size: 9px;
+  font-weight: 700;
+  padding: 3px 10px;
+  background: #FFD100;
+  border-radius: 10px;
+  white-space: nowrap;
+}
+
+/* ===== KPI CARDS ===== */
+.kpi-row {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 5px;
+  margin-bottom: 6px;
+}
+.kpi {
+  background: #E8F5EE;
+  border-radius: 4px;
+  padding: 6px 8px;
+  border-left: 3px solid #006633;
+}
+.kpi.red { border-left-color: #CC0000; background: #FFF3F3; }
+.kpi.amber { border-left-color: #854F0B; background: #FFF8EE; }
+.kpi-label { font-size: 7px; color: #558866; font-weight: 700; text-transform: uppercase; letter-spacing: 0.3px; margin-bottom: 2px; }
+.kpi-val { font-size: 19px; font-weight: 700; color: #1A1A1A; line-height: 1; }
+.kpi-sub { font-size: 7.5px; color: #555; margin-top: 2px; }
+.kpi-delta { font-size: 8px; font-weight: 700; margin-top: 2px; }
+.dn { color: #CC0000; }
+.up { color: #006633; }
+.am { color: #854F0B; }
+
+/* ===== SECTION TITLE ===== */
+.sec-title {
+  font-size: 8px;
+  font-weight: 700;
+  color: #006633;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  border-bottom: 1px solid #C0D8C8;
+  padding-bottom: 2px;
+  margin-bottom: 5px;
+}
+
+/* ===== GRID LAYOUT ===== */
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+.grid-6040 { display: grid; grid-template-columns: 60% 40%; gap: 8px; margin-bottom: 8px; }
+
+/* ===== TABLES ===== */
+table { width: 100%; border-collapse: collapse; font-size: 7.5px; }
+th { background: #006633; color: white; padding: 3px 5px; text-align: left; font-weight: 700; font-size: 7px; }
+td { padding: 2.5px 5px; border-bottom: 0.5px solid #E8F0EC; }
+tr:nth-child(even) td { background: #F4FBF7; }
+
+/* ===== CHART CONTAINERS ===== */
+.chart-wrap { height: 120px; position: relative; }
+.chart-wrap-sm { height: 90px; position: relative; }
+.chart-wrap-lg { height: 140px; position: relative; }
+
+/* ===== ALERT / NEWS ITEMS ===== */
+.alert-box {
+  border-radius: 3px;
+  padding: 5px 7px;
+  margin-bottom: 4px;
+  font-size: 8px;
+  line-height: 1.5;
+}
+.alert-box.red { background: #FFF0F0; border-left: 3px solid #CC0000; }
+.alert-box.amber { background: #FFF8EE; border-left: 3px solid #854F0B; }
+.alert-box.green { background: #F0F8F4; border-left: 3px solid #006633; }
+.alert-box strong { color: #1A1A1A; }
+
+/* ===== MARKET BLOCK ===== */
+.market-block {
+  background: #F4FBF7;
+  border-radius: 4px;
+  padding: 6px 8px;
+  border-left: 3px solid #006633;
+  margin-bottom: 6px;
+}
+.market-block.india { border-left-color: #006633; }
+.market-block.sea { border-left-color: #FFD100; }
+.market-block.bgd { border-left-color: #94C9A9; }
+.market-title { font-size: 9px; font-weight: 700; color: #006633; margin-bottom: 3px; }
+.market-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 3px; font-size: 7.5px; }
+.market-grid .lbl { color: #558866; font-weight: 700; font-size: 7px; }
+
+/* ===== INSIGHT CARDS ===== */
+.insight-card {
+  background: #F4FBF7;
+  border-radius: 4px;
+  padding: 7px 9px;
+  border-top: 2px solid #006633;
+  margin-bottom: 5px;
+  font-size: 8px;
+  line-height: 1.6;
+}
+.insight-card .num { font-size: 11px; font-weight: 700; color: #006633; margin-right: 3px; }
+
+/* ===== FOOTER ===== */
+.footer {
+  background: #006633;
+  padding: 5px 12px;
+  border-radius: 3px;
+  margin-top: 10px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+.footer-left { font-size: 7.5px; color: rgba(255,255,255,0.85); line-height: 1.6; }
+.footer-label { font-size: 7px; font-weight: 700; color: #FFD100; letter-spacing: 0.3px; margin-bottom: 1px; }
+.footer-right { font-size: 6.5px; color: rgba(255,255,255,0.6); text-align: right; line-height: 1.7; }
+
+/* ===== SIZE PILL ===== */
+.size-pill {
+  display: inline-block;
+  background: #006633;
+  color: white;
+  font-size: 7px;
+  font-weight: 700;
+  padding: 1px 5px;
+  border-radius: 8px;
+  margin: 1px;
+}
+.port-badge {
+  background: #E8F5EE;
+  border: 1px solid #C0D8C8;
+  border-radius: 4px;
+  padding: 5px 8px;
+  font-size: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 6px;
+}
+
+/* ===== PROGRESS BAR ===== */
+.prog-bar-wrap { background: #E8F0EC; border-radius: 3px; height: 5px; width: 100%; }
+.prog-bar { background: #006633; height: 5px; border-radius: 3px; }
+.prog-bar.red { background: #CC0000; }
+.prog-bar.amber { background: #854F0B; }
+.prog-bar.yellow { background: #FFD100; }
+
+/* ===== FILTER BAR ===== */
+.filter-bar {
+  background: #004D26;
+  border-radius: 4px;
+  padding: 6px 12px;
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.filter-bar label { font-size: 8px; font-weight:700; color:#C8F0D8; text-transform:uppercase; letter-spacing:0.3px; white-space:nowrap; }
+.filter-select {
+  background: #006633;
+  border: 1px solid #FFD100;
+  color: white;
+  font-size: 8.5px;
+  padding: 3px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  min-width: 160px;
+}
+.filter-select option { background:#004D26; }
+.filter-select:focus { outline:none; border-color:#FFD100; }
+.filter-divider { width:1px; height:22px; background:rgba(255,255,255,0.2); }
+/* Toggle */
+.toggle-wrap { display:flex; align-items:center; gap:6px; }
+.toggle-label { font-size:8px; font-weight:700; color:#C8F0D8; }
+.toggle-btn {
+  display:flex; border-radius:4px; overflow:hidden; border:1px solid rgba(255,255,255,0.3);
+}
+.toggle-btn button {
+  background:transparent; border:none; color:rgba(255,255,255,0.6);
+  font-size:8px; font-weight:700; padding:3px 10px; cursor:pointer;
+  transition: background 0.15s, color 0.15s;
+}
+.toggle-btn button.active { background:#FFD100; color:#004D26; }
+/* Mode badges */
+.mode-badge {
+  font-size:7px; font-weight:700; padding:2px 7px; border-radius:8px;
+  background:rgba(255,255,255,0.15); color:#FFD100; border:1px solid rgba(255,221,0,0.4);
+}
+.client-badge {
+  font-size:7.5px; font-weight:700; padding:2px 8px; border-radius:8px;
+  background:#FFD100; color:#004D26;
+}
+/* ===== SECTION VISIBILITY ===== */
+.internal-only { }
+.client-hide { }
+
+/* ===== CLASS & SIZE PROFILE SUMMARY ===== */
+#classSizeSection { margin-bottom: 8px; }
+.cs-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 7px;
+  margin-bottom: 0;
+}
+.cs-panel {
+  border: 1px solid #C0D8C8;
+  border-radius: 5px;
+  overflow: hidden;
+}
+.cs-header {
+  background: #006633;
+  color: white;
+  font-size: 7.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 4px 9px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.cs-header .cs-subtitle { color: rgba(255,255,255,0.65); font-weight: 400; font-size: 7px; text-transform: none; letter-spacing: 0; }
+.cs-body { padding: 0; }
+.cs-table { width: 100%; border-collapse: collapse; font-size: 7.5px; }
+.cs-table th { background: #004D26; color: white; padding: 2.5px 8px; text-align: left; font-weight: 700; font-size: 7px; border-right: 1px solid #005028; }
+.cs-table th:last-child { border-right: none; }
+.cs-table td { padding: 2.5px 8px; border-bottom: 0.5px solid #E8F0EC; border-right: 0.5px solid #E8F0EC; }
+.cs-table td:last-child { border-right: none; }
+.cs-table tr:nth-child(even) td { background: #F4FBF7; }
+.cs-table tr.cs-total td { background: #E8F5EE !important; font-weight: 700; color: #006633; border-top: 1.5px solid #006633; }
+.cs-table td.cs-name { font-weight: 700; color: #006633; }
+.cs-table td.cs-peak-bar { width: 80px; }
+.cs-bar-wrap { background: #E8F0EC; border-radius: 2px; height: 5px; }
+.cs-bar { background: #006633; height: 5px; border-radius: 2px; }
+.cs-bar.cs-bar-peak { background: #FFD100; }
+.cs-bar.cs-bar-special { background: #854F0B; }
+.cs-na { font-size: 7.5px; color: #888; font-style: italic; padding: 8px 9px; }
+/* print */
+@media print {
+  body.client-view #classSizeSection { display: none !important; }
+}
+
+/* ===== CONSOLIDATED CLIENT VIEW TABLE ===== */
+#clientViewPanel {
+  background: white;
+  border: 1px solid #C0D8C8;
+  border-radius: 6px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+/* Force table-layout fixed for pixel-perfect column alignment */
+.cpt {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 7.5px;
+}
+/* Client strip header inside panel */
+.cv-strip {
+  background: #004D26;
+  padding: 7px 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.cv-strip-title { font-size: 11px; font-weight: 700; color: white; }
+.cv-strip-sub   { font-size: 7.5px; color: rgba(255,255,255,0.7); margin-top: 1px; }
+.cv-strip-badge {
+  background: #FFD100; color: #004D26;
+  font-size: 8px; font-weight: 700;
+  padding: 2px 9px; border-radius: 8px;
+  white-space: nowrap;
+}
+/* KPI mini strip */
+.cv-kpi-strip {
+  display: flex;
+  gap: 0;
+  border-bottom: 1px solid #C0D8C8;
+}
+.cv-kpi-mini {
+  flex: 1;
+  padding: 5px 8px;
+  border-right: 1px solid #E8F0EC;
+  background: #F4FBF7;
+}
+.cv-kpi-mini:last-child { border-right: none; }
+.cv-kpi-mini .lbl { font-size: 6.5px; font-weight: 700; color: #558866; text-transform: uppercase; letter-spacing: 0.3px; }
+.cv-kpi-mini .val { font-size: 13px; font-weight: 700; color: #1A1A1A; line-height: 1.1; margin-top: 1px; }
+.cv-kpi-mini .sub { font-size: 6.5px; color: #777; margin-top: 1px; }
+/* Consolidated program table wrapper */
+.cpt-wrap { overflow-x: auto; padding: 0; }
+.cpt-title-bar {
+  background: #006633;
+  color: white;
+  font-size: 8px; font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  padding: 4px 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.cpt-title-bar span {
+  color: rgba(255,255,255,0.65);
+  font-weight: 400; font-size: 7px;
+  text-transform: none; letter-spacing: 0;
+}
+/* The main consolidated table — defined in clientViewPanel block above */
+.cpt th {
+  background: #006633; color: white;
+  padding: 3.5px 8px;
+  text-align: center;
+  font-weight: 700; font-size: 7px;
+  border-right: 1px solid #005028;
+}
+.cpt th.cpt-row-hdr { text-align: left; min-width: 180px; }
+.cpt th.cpt-total-hdr { background: #004D26; }
+.cpt td {
+  padding: 3px 8px;
+  text-align: center;
+  border-bottom: 0.5px solid #E8F0EC;
+  border-right: 0.5px solid #E8F0EC;
+  min-width: 45px;
+}
+.cpt td.cpt-row-hdr { text-align: left; font-weight: 700; color: #004D26; background: #F4FBF7; min-width: 180px; }
+.cpt tr:nth-child(even) td { background: #F4FBF7; }
+.cpt tr:nth-child(even) td.cpt-row-hdr { background: #EDF7F2; }
+.cpt td.cpt-active { background: #E8F5EE; font-weight: 600; }
+.cpt td.cpt-peak   { background: #FFD100 !important; font-weight: 700; color: #004D26; }
+.cpt td.cpt-empty  { color: #ccc; font-weight: 400; }
+.cpt td.cpt-total-col { background: #E8F5EE !important; font-weight: 700; color: #006633; border-left: 1.5px solid #006633; }
+.cpt tr.cpt-total-row td {
+  background: #004D26 !important; color: white !important;
+  font-weight: 700; border-top: 2px solid #003320;
+  font-size: 8px;
+}
+.cpt tr.cpt-total-row td.cpt-row-hdr { color: #FFD100 !important; }
+.cpt tr.cpt-total-row td.cpt-total-col { background: #FFD100 !important; color: #004D26 !important; }
+/* Week subheader in header row */
+.cpt th.cpt-peak-hdr { background: #cc9900 !important; color: white !important; }
+/* Note */
+.cpt-note {
+  font-size: 6.5px; color: #888; font-style: italic;
+  padding: 4px 10px; border-top: 1px solid #E8F0EC;
+  background: #FAFCFB;
+}
+/* ===== ALL-CLIENTS INTERNAL MATRIX ===== */
+#allClientsMatrix {
+  margin-bottom: 8px;
+  display: none; /* shown only in Internal view when All Clients */
+}
+#allClientsMatrix .cpt-title-bar { background: #004D26; }
+/* Print: client view shows only the panel */
+@media print {
+  body.client-view .filter-bar { display: none !important; }
+  body.client-view #classSizeSection { display: none !important; }
+  body.client-view #allClientsMatrix { display: none !important; }
+  body.client-view .grid-2 { display: none !important; }
+  body.client-view .internal-only { display: none !important; }
+  body.client-view #insightsContainer { display: none !important; }
+  body.client-view #recsContainer { display: none !important; }
+  body.client-view #alertsContainer { display: none !important; }
+  body.client-view .footer { display: none !important; }
+  body.client-view #clientViewPanel { display: block !important; }
+}
+
+/* ===== KPI – 3-col strip ===== */
+.kpi-row { grid-template-columns: repeat(3, 1fr) !important; }
+
+/* ===== HEADER slim ===== */
+.hdr-sub  { display: none !important; }
+
+/* ===== CLASS & SIZE hidden by default ===== */
+#classSizeSection { display: none; }
+
+/* ===== SIZE MIX section hidden by default ===== */
+#sizeMixSection { display: none; }
+
+/* ===== COMMERCIAL FOCUS ===== */
+#commercialFocus {
+  margin-bottom: 8px;
+}
+.cf-wrap {
+  background: linear-gradient(135deg, #004D26 0%, #006633 100%);
+  border-radius: 5px;
+  padding: 8px 12px;
+  color: white;
+}
+.cf-title {
+  font-size: 8.5px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.5px; color: #FFD100; margin-bottom: 6px;
+}
+.cf-bullets { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+.cf-bullet {
+  background: rgba(255,255,255,0.08);
+  border-radius: 4px;
+  padding: 6px 8px;
+  border-left: 3px solid rgba(255,209,0,0.6);
+  font-size: 7.5px; line-height: 1.5; color: rgba(255,255,255,0.9);
+}
+.cf-bullet .cf-tag {
+  font-size: 6.5px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.4px; margin-bottom: 2px;
+}
+.cf-tag.risk       { color: #FF8080; }
+.cf-tag.opportunity{ color: #7FFFB0; }
+.cf-tag.insight    { color: #FFD100; }
+
+/* ===== WEEKLY IMBALANCE tags ===== */
+.wk-tag {
+  display: inline-block;
+  font-size: 6px; font-weight: 700; text-transform: uppercase;
+  padding: 1px 4px; border-radius: 3px;
+  margin-left: 3px; vertical-align: middle;
+}
+.wk-high { background: #FFF0D0; color: #854F0B; border: 1px solid #F0C060; }
+.wk-low  { background: #F0F8F0; color: #558866; border: 1px solid #B0D8B0; }
+
+/* ===== CLIENT RISK TAGS ===== */
+.risk-tag {
+  display: inline-block;
+  font-size: 6.5px; font-weight: 700;
+  padding: 1px 5px; border-radius: 8px;
+  white-space: nowrap;
+}
+.risk-at-risk    { background: #FFEAEA; color: #CC0000; border: 1px solid #FFAAAA; }
+.risk-on-track   { background: #E8F5EE; color: #006633; border: 1px solid #A0D8B0; }
+.risk-opportunity{ background: #FFF8D0; color: #7A5800; border: 1px solid #F0D060; }
+
+/* ===== SUBVARIETY FILTER ===== */
+.filter-select-sm {
+  background: #006633;
+  border: 1px solid rgba(255,255,255,0.3);
+  color: white;
+  font-size: 8px;
+  padding: 3px 6px;
+  border-radius: 4px;
+  cursor: pointer;
+  min-width: 110px;
+}
+.filter-select-sm option { background: #004D26; }
+.filter-select-sm:focus { outline: none; border-color: #FFD100; }
+</style>
+</head>
+<body>
+
+<!-- ==================== FILTER BAR ==================== -->
+<div class="filter-bar" id="filterBar">
+  <label>🔍 Client Selector</label>
+  <select class="filter-select" id="clientSelect" onchange="applyFilter()">
+    <option value="__ALL__">All Clients</option>
+    <option value="Snow King International Trading Co.">Snow King International Trading Co.</option>
+    <option value="IG International Pvt Ltd">IG International Pvt Ltd</option>
+    <option value="MAH Fruits International">MAH Fruits International</option>
+    <option value="NGK Trading Company Pvt Ltd">NGK Trading Company Pvt Ltd</option>
+    <option value="Terra Exports LLC">Terra Exports LLC</option>
+    <option value="Wal-Mart China Supercenter Merch">Wal-Mart China Supercenter Merch</option>
+    <option value="Shanghai Nowfrutti Co.,Ltd">Shanghai Nowfrutti Co.,Ltd</option>
+    <option value="Jaguar">Jaguar</option>
+    <option value="PING KEE HONG TRADING INTERNATIONAL">PING KEE HONG TRADING INTERNATIONAL</option>
+    <option value="PT Indofresh">PT Indofresh</option>
+    <option value="Jiaxing Yuehao Import & Export">Jiaxing Yuehao Import & Export</option>
+    <option value="Reliance Retail Ltd">Reliance Retail Ltd</option>
+    <option value="Taiwan">Taiwan</option>
+    <option value="Trent Hypermarket Private Limited">Trent Hypermarket Private Limited</option>
+    <option value="BEIJING HUI NONG INTERNATIONAL">BEIJING HUI NONG INTERNATIONAL</option>
+    <option value="RKA INTERNATIONAL">RKA INTERNATIONAL</option>
+    <option value="Hunan Greenery Fruit Co. Ltd">Hunan Greenery Fruit Co. Ltd</option>
+    <option value="Beijing Jingdong Century Informatio">Beijing Jingdong Century Informatio</option>
+    <option value="MADIHAA COMPANY PVT LTD">MADIHAA COMPANY PVT LTD</option>
+    <option value="Wholesale China">Wholesale China</option>
+    <option value="Greenery">Greenery</option>
+    <option value="NTUC Fairprice Co-operative Ltd">NTUC Fairprice Co-operative Ltd</option>
+    <option value="SHINE AND SHINE FOOD COMPANY">SHINE AND SHINE FOOD COMPANY</option>
+    <option value="RKA">RKA</option>
+    <option value="Taiwan Fullbloom Int’l Ltd.">Taiwan Fullbloom Int’l Ltd.</option>
+    <option value="Aartsen">Aartsen</option>
+    <option value="Melcom Limited">Melcom Limited</option>
+    <option value="K&T FRESH MARKETING SDN BHD">K&T FRESH MARKETING SDN BHD</option>
+    <option value="India C">India C</option>
+    <option value="Seohyun  Trading co., LTD">Seohyun  Trading co., LTD</option>
+  </select>
+  <div class="filter-divider"></div>
+  <div class="toggle-wrap">
+    <span class="toggle-label">View Mode</span>
+    <div class="toggle-btn">
+      <button id="btnInternal" class="active" onclick="setViewMode('internal')">Internal View</button>
+      <button id="btnClient" onclick="setViewMode('client')">Client View</button>
+    </div>
+  </div>
+  <div class="filter-divider"></div>
+  <label>🌿 Subvariety</label>
+  <select class="filter-select-sm" id="subvarietySelect" onchange="applyFilter()">
+    <option value="__ALL__">All Subvarieties</option>
+  </select>
+  <label>📐 Size</label>
+  <select class="filter-select-sm" id="sizeSelect" onchange="applyFilter()">
+    <option value="__ALL__">All Sizes</option>
+  </select>
+  <div class="filter-divider"></div>
+  <span class="mode-badge" id="modeBadge">INTERNAL</span>
+  <span class="client-badge" id="clientBadge" style="display:none;"></span>
+</div>
+
+
+<!-- ==================== HEADER ==================== -->
+<div class="header">
+  <div class="header-left">
+    <!-- SAFRESCO SVG LOGO (inline, adapted) -->
+    <svg height="30" viewBox="0 0 905 120" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0;">
+      <path fill="#FFD100" d="m49.19,119.67C31.64,119.67,13.91,113.54,0,101.12l15.07-18.05c10.43,8.61,21.37,14.08,34.62,14.08,10.43,0,16.73-4.14,16.73-10.93v-.33c0-6.46-3.98-9.78-23.36-14.74-23.36-5.96-38.43-12.42-38.43-35.45v-.33C4.64,14.33,21.53.41,45.22.41c16.89,0,31.31,5.3,43.07,14.74l-13.25,19.21c-10.27-7.12-20.38-11.43-30.15-11.43s-14.9,4.47-14.9,10.1v.33c0,7.62,4.97,10.1,25.01,15.24,23.52,6.13,36.77,14.58,36.77,34.78v.33c0,23.02-17.55,35.94-42.56,35.94Z"/>
+      <path fill="#FFD100" d="m195.97,118.01l-10.6-26.01h-49.03l-10.6,26.01h-26.01L149.42,1.24h23.52l49.7,116.77h-26.67Zm-35.11-86.13l-15.41,37.6h30.81l-15.41-37.6Z"/>
+      <path fill="#FFD100" d="m264.24,25.26v24.68h55.32v23.19h-55.32v44.89h-25.51V2.07h88.28v23.19h-62.77Z"/>
+      <path fill="#FFD100" d="m415.98,118.01l-24.85-37.1h-20.04v37.1h-25.51V2.07h53c27.33,0,43.73,14.41,43.73,38.26v.33c0,18.72-10.1,30.48-24.84,35.94l28.32,41.41h-29.81Zm.5-76.36c0-10.93-7.62-16.56-20.04-16.56h-25.34v33.29h25.83c12.43,0,19.55-6.63,19.55-16.4v-.33Z"/>
+      <path fill="#FFD100" d="m463.54,118.01V2.07h87.46v22.69h-62.11v23.52h54.66v22.69h-54.66v24.35h62.94v22.69h-88.28Z"/>
+      <path fill="#FFD100" d="m613.96,119.67c-17.56,0-35.28-6.12-49.19-18.55l15.07-18.05c10.44,8.61,21.37,14.08,34.62,14.08,10.43,0,16.73-4.14,16.73-10.93v-.33c0-6.46-3.98-9.78-23.36-14.74-23.36-5.96-38.43-12.42-38.43-35.45v-.33c0-21.03,16.9-34.95,40.58-34.95,16.89,0,31.3,5.3,43.07,14.74l-13.25,19.21c-10.27-7.12-20.37-11.43-30.15-11.43s-14.9,4.47-14.9,10.1v.33c0,7.62,4.97,10.1,25.01,15.24,23.52,6.13,36.77,14.58,36.77,34.78v.33c0,23.02-17.56,35.94-42.57,35.94Z"/>
+      <path fill="#0a7a35" d="m731.25,120c-34.12,0-59.46-26.33-59.46-59.63v-.33c0-32.96,24.84-59.96,60.46-59.96,21.86,0,34.95,7.29,45.71,17.89l-16.23,18.72c-8.95-8.12-18.06-13.08-29.65-13.08-19.55,0-33.63,16.23-33.63,36.11v.33c0,19.88,13.75,36.44,33.63,36.44,13.25,0,21.37-5.3,30.48-13.58l16.23,16.4c-11.93,12.76-25.18,20.71-47.54,20.71Z"/>
+      <path fill="#FFD100" d="m893.4,20.28c-9.9-12.33-24.05-19.19-38.67-20.28-2.09,14.51,1.55,29.8,11.45,42.13,9.9,12.33,24.05,19.19,38.67,20.28,2.09-14.51-1.55-29.8-11.45-42.13Z"/>
+      <path fill="#0a7a35" d="m877.76,71.8c-4.58,13.97-16.86,24.22-32.95,24.22-20.46,0-34.64-16.17-34.64-35.96v-.33c0-17.95,11.98-33.05,29.44-35.74-1.78-7.7-2.3-15.69-1.46-23.67-32.12,3.08-54.56,28.32-54.56,59.07v.33c0,32.83,25.9,59.72,61.54,59.72,28.51,0,50.54-17.01,58.23-40.62-8.98-.7-17.65-3.17-25.61-7.03h.01Z"/>
+    </svg>
+    <div>
+      <div class="hdr-title" id="dynamicHdrTitle">CLIENT DEMAND PLAN DASHBOARD &nbsp;·&nbsp; ALL VARIETIES &nbsp;·&nbsp; 2026 &nbsp;·&nbsp; W14–W41</div>
+      <div class="hdr-sub" id="dynamicHdrSub">Varieties: Early Soft, Grapefruit, Late Mandarin, Lemon, Navels, Valencias &nbsp;|&nbsp; Season 2026</div>
+      <div class="hdr-meta" id="dynamicHdrMeta" style="display:none;"></div>
+    </div>
+  </div>
+  <span class="badge" id="dynamicBadge">W14–W41 · 2026</span>
+</div>
+
+<!-- ==================== KPI CARDS ==================== -->
+<div class="kpi-row">
+  <div class="kpi">
+    <div class="kpi-label">Total Volume (Pallets)</div>
+    <div class="kpi-val">17,879</div>
+    <div class="kpi-sub">All clients · W14–W41</div>
+  </div>
+  <div class="kpi">
+    <div class="kpi-label">Active Clients</div>
+    <div class="kpi-val">30</div>
+    <div class="kpi-sub">Across 6 markets</div>
+  </div>
+  <div class="kpi">
+    <div class="kpi-label">Markets</div>
+    <div class="kpi-val">6</div>
+    <div class="kpi-sub">AF · BGD · China · HK · India · SEA</div>
+  </div>
+  <div class="kpi amber">
+    <div class="kpi-label">Peak PackWeek</div>
+    <div class="kpi-val">W30</div>
+    <div class="kpi-sub am"><strong>8.0%</strong> of total volume</div>
+  </div>
+  <div class="kpi">
+    <div class="kpi-label">Peak ETA Week</div>
+    <div class="kpi-val">W36</div>
+    <div class="kpi-sub">1,418 pallets arriving</div>
+  </div>
+  <div class="kpi">
+    <div class="kpi-label">Top Client by Volume</div>
+    <div class="kpi-val" style="font-size:9px;margin-top:2px;">Snow King Internationa</div>
+    <div class="kpi-sub">3,800 pal · 21.3%</div>
+  </div>
+</div>
+
+
+
+<!-- ==================== COMMERCIAL FOCUS ==================== -->
+<div id="commercialFocus">
+  <div class="cf-wrap">
+    <div class="cf-title" id="cfTitle">COMMERCIAL FOCUS – WEEK <span id="cfWeek">—</span></div>
+    <div class="cf-bullets" id="cfBullets"><!-- filled by JS --></div>
+  </div>
+</div>
+
+
+<!-- ==================== CLASS & SIZE PROFILE ==================== -->
+<div id="classSizeSection">
+  <div class="cs-grid">
+    <!-- CLASS SUMMARY -->
+    <div class="cs-panel" id="classPanel">
+      <div class="cs-header">
+        🏷 Class Summary <span class="cs-subtitle" id="classSubtitle">All Classes</span>
+      </div>
+      <div class="cs-body" id="classBody"><!-- filled by JS --></div>
+    </div>
+    <!-- SIZE PROFILE -->
+    <div class="cs-panel" id="sizePanel">
+      <div class="cs-header">
+        📐 Size Profile <span class="cs-subtitle" id="sizeSubtitle">All Sizes</span>
+      </div>
+      <div class="cs-body" id="sizeBody"><!-- filled by JS --></div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ==================== CLIENT VIEW PANEL ==================== -->
+<div id="clientViewPanel">
+  <!-- Strip header filled by JS -->
+  <div id="cvStrip" class="cv-strip">
+    <div>
+      <div class="cv-strip-title" id="cvStripTitle">Client Program · 2026</div>
+      <div class="cv-strip-sub" id="cvStripSub">Season 2026</div>
+    </div>
+    <span class="cv-strip-badge" id="cvStripBadge">DRAFT PROGRAMME</span>
+  </div>
+  <!-- KPI mini strip filled by JS -->
+  <div class="cv-kpi-strip" id="cvKpiStrip"><!-- filled by JS --></div>
+  <!-- Consolidated program table -->
+  <div class="cpt-wrap">
+    <div class="cpt-title-bar">
+      📋 Seasonal Programme — ETA by Specification
+      <span id="cvCptSubtitle">ETA Weeks · Pallets</span>
+    </div>
+    <div style="overflow-x:auto;">
+      <table class="cpt" id="cvCptTable"><!-- filled by JS --></table>
+    </div>
+  </div>
+  <div class="cpt-note">Program subject to weekly adjustments based on market conditions and availability.</div>
+</div>
+
+
+<!-- ==================== ALL CLIENTS MATRIX ==================== -->
+<div id="allClientsMatrix">
+  <div class="cpt-wrap">
+    <div class="cpt-title-bar">
+      📊 Programme Matrix — All Clients by ETA Week
+      <span id="acmSubtitle">ETA Weeks · Pallets</span>
+    </div>
+    <div style="overflow-x:auto;">
+      <table class="cpt" id="acmTable"><!-- filled by JS --></table>
+    </div>
+  </div>
+</div>
+
+
+<!-- ==================== WEEKLY DISTRIBUTION + ETA ==================== -->
+<div class="grid-2">
+  <div>
+    <div class="sec-title">Weekly Distribution by PackWeek</div>
+    <div class="chart-wrap">
+      <canvas id="chartPackWeek"></canvas>
+    </div>
+  </div>
+  <div>
+    <div class="sec-title">ETA Distribution by ETAWeek</div>
+    <div class="chart-wrap">
+      <canvas id="chartETAWeek"></canvas>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== CLIENT BREAKDOWN ==================== -->
+<div class="sec-title internal-only">Client Breakdown — Sorted by Total Volume</div>
+<table id="clientBreakdownTable">
+  <thead>
+    <tr>
+      <th>Client</th>
+      <th>Market</th>
+      <th>Total Volume</th>
+      <th>Share %</th>
+      <th>Volume Bar</th>
+      <th>Status</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>MAH</strong></td>
+      <td>SEA</td>
+      <td>340</td>
+      <td>29.3%</td>
+      <td><div class="prog-bar-wrap"><div class="prog-bar" style="width:29.3%"></div></div></td>
+      <td>W21, W20, W19</td>
+    </tr>
+    <tr>
+      <td><strong>MAH</strong></td>
+      <td>BGD</td>
+      <td>240</td>
+      <td>20.7%</td>
+      <td><div class="prog-bar-wrap"><div class="prog-bar" style="width:20.7%"></div></div></td>
+      <td>W21, W22, W20</td>
+    </tr>
+    <tr>
+      <td><strong>IG</strong></td>
+      <td>India</td>
+      <td>200</td>
+      <td>17.2%</td>
+      <td><div class="prog-bar-wrap"><div class="prog-bar yellow" style="width:17.2%"></div></div></td>
+      <td>W21, W19, W20</td>
+    </tr>
+    <tr>
+      <td><strong>NGK</strong></td>
+      <td>India</td>
+      <td>200</td>
+      <td>17.2%</td>
+      <td><div class="prog-bar-wrap"><div class="prog-bar yellow" style="width:17.2%"></div></div></td>
+      <td>W21, W19, W20</td>
+    </tr>
+    <tr>
+      <td><strong>Reliance</strong></td>
+      <td>India</td>
+      <td>80</td>
+      <td>6.9%</td>
+      <td><div class="prog-bar-wrap"><div class="prog-bar" style="width:6.9%"></div></div></td>
+      <td>W19, W20, W21, W22</td>
+    </tr>
+    <tr>
+      <td><strong>Jaguar</strong></td>
+      <td>India</td>
+      <td>60</td>
+      <td>5.2%</td>
+      <td><div class="prog-bar-wrap"><div class="prog-bar" style="width:5.2%"></div></div></td>
+      <td>W20, W21, W22</td>
+    </tr>
+    <tr>
+      <td><strong>India C</strong></td>
+      <td>India</td>
+      <td>20</td>
+      <td>1.7%</td>
+      <td><div class="prog-bar-wrap"><div class="prog-bar" style="width:1.7%"></div></div></td>
+      <td>W21</td>
+    </tr>
+    <tr>
+      <td><strong>Aartsen</strong></td>
+      <td>India</td>
+      <td>20</td>
+      <td>1.7%</td>
+      <td><div class="prog-bar-wrap"><div class="prog-bar" style="width:1.7%"></div></div></td>
+      <td>W21</td>
+    </tr>
+    <tr style="background:#E8F5EE;">
+      <td><strong>TOTAL</strong></td>
+      <td>3 Markets</td>
+      <td><strong>1,160</strong></td>
+      <td><strong>100%</strong></td>
+      <td><div class="prog-bar-wrap"><div class="prog-bar" style="width:100%"></div></div></td>
+      <td>W19–W23</td>
+    </tr>
+  </tbody>
+</table>
+
+<!-- ==================== MARKET FOCUS ==================== -->
+<div style="margin-top:8px;">
+  <div class="sec-title internal-only">Market Focus</div>
+  <div class="grid-3 internal-only" id="marketFocusContainer">
+  <!-- Dynamic market blocks rendered by JS -->
+</div>
+
+<!-- ==================== SIZE MIX ==================== -->
+<div id="sizeMixSection" style="margin-top:4px;">
+  <div class="grid-2">
+    <div>
+      <div class="sec-title">Size Mix — Volume Distribution</div>
+      <div class="chart-wrap-sm">
+        <canvas id="chartSizeMix"></canvas>
+      </div>
+    </div>
+    <div>
+      <div class="sec-title">Size Mix Summary</div>
+      <table id="sizeMixTable"><!-- filled by JS --></table>
+    </div>
+  </div>
+</div>
+
+
+<!-- ==================== RISK & ALERTS ==================== -->
+<div style="margin-top:8px;">
+  <div class="sec-title internal-only">⚠ Risk &amp; Alerts — Automated Analysis</div>
+  <div id="alertsContainer" class="internal-only">
+  <!-- Dynamic alerts rendered by JS -->
+</div>
+
+
+<!-- ==================== COMMERCIAL INSIGHTS ==================== -->
+<div style="margin-top:8px;">
+  <div class="sec-title">💡 Commercial Insights</div>
+  <div id="insightsContainer">
+  <!-- Dynamic insights rendered by JS -->
+</div>
+
+<!-- ==================== RECOMMENDATIONS ==================== -->
+<div style="margin-top:4px;">
+  <div class="sec-title">🎯 Recommendations</div>
+  <div id="recsContainer">
+  <!-- Dynamic recs rendered by JS -->
+</div>
+
+<!-- ==================== FOOTER ==================== -->
+<div class="footer">
+  <div>
+    <div class="footer-label">COMMERCIAL OUTLOOK</div>
+    <div class="footer-left">
+      Client Demand Plan 2026: W14–W41 · Total 17,879 pallets · 6 markets · 30 clients · Early Soft, Grapefruit, Late Mandarin, Lemon, Navels, Valencias.<br>
+      China leads (40%). W30 peak (8%). FOB/TON data available. Status tracking active.
+    </div>
+  </div>
+  <div class="footer-right">
+    SAFRESCO | Client Plan Dashboard · Soft Citrus 2026<br>
+    Generated: 10 Apr 2026 · Source: ClientPlan_SoftCitrus_2026-04-10.xlsx<br>
+    Data current as of last update · For internal commercial use only
+  </div>
+</div>
+
+<!-- ==================== CHART.JS ==================== -->
+
+
+<script>
+// ============================================================
+// GOOGLE SHEETS LIVE DATA SOURCE
+// Reads data from the published Google Sheet every time the
+// dashboard loads (or on manual refresh). No hardcoded rows.
+// ============================================================
+
+// ── Google Apps Script Web App URL ───────────────────────────
+// Proxy que elimina restricciones CORS — generado desde tu Sheet
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxDhDIOHkpGXMW8NH2iXXXAR59RgYX1Gqs8EgiTLF0bV54tgdDKsJ7yOJH4Tfoj2V7U/exec';
+
+// ── Runtime state ────────────────────────────────────────────
+let RAW_DATA = [];          // filled after fetch
+let _dataLoaded = false;    // guard so initDynamic waits
+
+// ── Loading overlay ──────────────────────────────────────────
+function showLoadingOverlay(msg) {
+  let el = document.getElementById('_gsOverlay');
+  if (!el) {
+    el = document.createElement('div');
+    el.id = '_gsOverlay';
+    el.style.cssText = `
+      position:fixed;top:0;left:0;width:100%;height:100%;
+      background:rgba(0,64,38,0.82);z-index:9999;
+      display:flex;flex-direction:column;align-items:center;
+      justify-content:center;gap:14px;
+    `;
+    el.innerHTML = `
+      <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="24" cy="24" r="20" stroke="rgba(255,255,255,0.2)" stroke-width="4"/>
+        <path d="M24 4 A20 20 0 0 1 44 24" stroke="#FFD100" stroke-width="4" stroke-linecap="round">
+          <animateTransform attributeName="transform" type="rotate" from="0 24 24" to="360 24 24" dur="0.9s" repeatCount="indefinite"/>
+        </path>
+      </svg>
+      <div id="_gsMsg" style="color:white;font-family:Arial,sans-serif;font-size:13px;font-weight:700;letter-spacing:0.5px;text-align:center;">${msg}</div>
+      <div id="_gsErr" style="color:#FF9090;font-size:10px;font-family:Arial,sans-serif;max-width:440px;text-align:center;display:none;padding:0 20px;"></div>
+      <button id="_gsRetry" onclick="loadFromSheet()" style="display:none;background:#FFD100;color:#004D26;border:none;padding:6px 18px;border-radius:6px;font-weight:700;font-size:11px;cursor:pointer;margin-top:4px;">🔄 Retry</button>
+    `;
+    document.body.appendChild(el);
+  } else {
+    document.getElementById('_gsMsg').textContent = msg;
+    document.getElementById('_gsErr').style.display = 'none';
+    document.getElementById('_gsRetry').style.display = 'none';
+    el.style.display = 'flex';
+  }
+}
+
+function hideLoadingOverlay() {
+  const el = document.getElementById('_gsOverlay');
+  if (el) el.style.display = 'none';
+}
+
+function showOverlayError(errText) {
+  const errEl  = document.getElementById('_gsErr');
+  const retryEl = document.getElementById('_gsRetry');
+  const msgEl  = document.getElementById('_gsMsg');
+  if (msgEl)   msgEl.textContent  = 'Could not load data from Google Sheets';
+  if (errEl)  { errEl.textContent  = errText; errEl.style.display = 'block'; }
+  if (retryEl)  retryEl.style.display = 'inline-block';
+}
+
+// ── Status badge in filter bar ───────────────────────────────
+function setDataStatusBadge(state, detail) {
+  let badge = document.getElementById('_gsBadge');
+  if (!badge) {
+    badge = document.createElement('span');
+    badge.id = '_gsBadge';
+    badge.style.cssText = 'font-size:7.5px;font-weight:700;padding:2px 8px;border-radius:8px;white-space:nowrap;';
+    const fb = document.getElementById('filterBar');
+    if (fb) fb.appendChild(badge);
+  }
+  const styles = {
+    loading: 'background:rgba(255,255,255,0.15);color:#FFD100;border:1px solid rgba(255,209,0,0.4);',
+    ok:      'background:#E8F5EE;color:#004D26;border:1px solid #A0D8B0;',
+    error:   'background:#FFEAEA;color:#CC0000;border:1px solid #FFAAAA;'
+  };
+  badge.style.cssText += styles[state] || styles.loading;
+  badge.textContent = detail;
+}
+
+// ── CSV parser ───────────────────────────────────────────────
+function parseCSV(text) {
+  const lines = text.split('\n').filter(l => l.trim());
+  if (lines.length < 2) return [];
+
+  // Parse a single CSV line respecting quoted fields
+  function parseLine(line) {
+    const result = [];
+    let cur = '', inQ = false;
+    for (let i = 0; i < line.length; i++) {
+      const ch = line[i];
+      if (ch === '"') {
+        if (inQ && line[i+1] === '"') { cur += '"'; i++; }
+        else inQ = !inQ;
+      } else if (ch === ',' && !inQ) {
+        result.push(cur.trim()); cur = '';
+      } else {
+        cur += ch;
+      }
+    }
+    result.push(cur.trim());
+    return result;
+  }
+
+  const headers = parseLine(lines[0]).map(h => h.replace(/^"|"$/g,'').trim());
+
+  // Map header names (flexible — tolerates extra spaces, different case)
+  function col(hdrs, ...names) {
+    for (const n of names) {
+      const idx = hdrs.findIndex(h => h.toLowerCase().replace(/\s+/g,'') === n.toLowerCase().replace(/\s+/g,''));
+      if (idx !== -1) return idx;
+    }
+    return -1;
+  }
+
+  const iClient    = col(headers, 'client');
+  const iMarket    = col(headers, 'market');
+  const iVariety   = col(headers, 'variety');
+  const iSubv      = col(headers, 'subvariety', 'subvar');
+  const iPackType  = col(headers, 'packtype', 'pack_type');
+  const iPort      = col(headers, 'port');
+  const iPackWeek  = col(headers, 'packweek', 'pack_week');
+  const iEtaWeek   = col(headers, 'etaweek', 'eta_week', 'eta');
+  const iSize      = col(headers, 'size');
+  const iClass     = col(headers, 'classcode', 'class', 'class_code');
+  const iVolume    = col(headers, 'volume', 'pallets', 'vol');
+  const iStatus    = col(headers, 'status');
+  const iFob       = col(headers, 'fob', 'fob_usd');
+
+  const rows = [];
+  for (let i = 1; i < lines.length; i++) {
+    const cells = parseLine(lines[i]).map(c => c.replace(/^"|"$/g,''));
+    if (cells.length < 3) continue;
+    const vol = parseFloat((iVolume >= 0 ? cells[iVolume] : '0').replace(',','')) || 0;
+    if (!cells[iClient >= 0 ? iClient : 0]) continue; // skip blank rows
+    rows.push({
+      client:    iClient   >= 0 ? cells[iClient]   : '',
+      market:    iMarket   >= 0 ? cells[iMarket]   : '',
+      variety:   iVariety  >= 0 ? cells[iVariety]  : '',
+      subvariety:iSubv     >= 0 ? cells[iSubv]     : '',
+      packType:  iPackType >= 0 ? cells[iPackType] : '',
+      port:      iPort     >= 0 ? cells[iPort]     : '',
+      packWeek:  parseInt((iPackWeek >= 0 ? cells[iPackWeek] : '0').replace(',','')) || 0,
+      etaWeek:   parseInt((iEtaWeek  >= 0 ? cells[iEtaWeek]  : '0').replace(',','')) || 0,
+      size:      iSize     >= 0 ? cells[iSize]     : '',
+      classCode: iClass    >= 0 ? cells[iClass]    : '',
+      volume:    vol,
+      status:    iStatus   >= 0 ? cells[iStatus]   : '',
+      fob:       parseFloat((iFob >= 0 ? cells[iFob] : '0').replace(',','')) || 0,
+    });
+  }
+  return rows.filter(r => r.volume > 0 || r.client);
+}
+
+// ── Main fetch function ──────────────────────────────────────
+async function loadFromSheet() {
+  showLoadingOverlay('Conectando con Google Sheets…');
+  setDataStatusBadge('loading', '⟳ Cargando…');
+
+  // Apps Script actúa de proxy: devuelve JSON sin restricciones CORS
+  const url = APPS_SCRIPT_URL + '?t=' + Date.now();
+
+  try {
+    const resp = await fetch(url, { cache: 'no-store' });
+
+    if (!resp.ok) {
+      throw new Error(`Error HTTP ${resp.status}. Comprueba que el Apps Script está desplegado correctamente.`);
+    }
+
+    const json = await resp.json();
+
+    if (!Array.isArray(json) || json.length === 0) {
+      throw new Error('El script devolvió datos vacíos. Comprueba que la hoja tiene filas con datos.');
+    }
+
+    // ── Diagnóstico: ver qué claves tiene la primera fila ──
+    const firstRow = json[0];
+    const keys = Object.keys(firstRow);
+    console.log('[SAFRESCO] Columnas recibidas:', keys);
+    console.log('[SAFRESCO] Primera fila:', JSON.stringify(firstRow));
+
+    // Convertir JSON del Apps Script al formato interno del dashboard
+    RAW_DATA = json.map((row, i) => {
+      const client   = String(row.Client     || row.client     || '').trim();
+      const market   = String(row.Market     || row.market     || '').trim();
+      const variety  = String(row.Variety    || row.variety    || '').trim();
+      const subv     = String(row.Subvariety || row.subvariety || '').trim();
+      const packType = String(row.Pack_Type  || row.packType   || row.PackType || '').trim();
+      const port     = String(row.Port       || row.port       || '').trim();
+      const packWeek = parseInt(row.PackWeek || row.packWeek   || 0) || 0;
+      const etaWeek  = parseInt(row.ETAWeek  || row.etaWeek   || 0) || 0;
+      const size     = String(row['Size Profile'] !== undefined ? row['Size Profile'] : (row.Size || row.size || '')).trim();
+      const classCode= String(row.Class      || row.classCode  || '').trim();
+      const volume   = parseFloat(row.Volume || row.volume     || 0) || 0;
+      const status   = String(row.Status     || row.status     || '').trim();
+      const fobRaw   = String(row['FOB/TON'] || row.FOB || row.fob || '0');
+      const fob      = parseFloat(fobRaw.replace(/[^0-9,.-]/g,'').replace(',','.')) || 0;
+
+      if (i < 3) console.log('[SAFRESCO] Fila', i, '→ client:', client, 'volume:', volume, 'packWeek:', packWeek, 'etaWeek:', etaWeek);
+
+      return { client, market, variety, subvariety: subv, packType, port, packWeek, etaWeek, size, classCode, volume, status, fob };
+    }).filter(r => r.client && r.volume > 0);
+
+    console.log('[SAFRESCO] Filas válidas tras filtro:', RAW_DATA.length, 'de', json.length);
+
+    if (RAW_DATA.length === 0) {
+      throw new Error('No se encontraron filas válidas. Verifica que las columnas "client" y "volume" tienen datos.');
+    }
+
+    _dataLoaded = true;
+
+    const ts = new Date().toLocaleTimeString('es-ES', { hour:'2-digit', minute:'2-digit' });
+    setDataStatusBadge('ok', `✓ ${RAW_DATA.length} filas · ${ts}`);
+    hideLoadingOverlay();
+
+    // Arrancar el dashboard — usar requestAnimationFrame para asegurar
+    // que todos los <script> del documento han sido evaluados
+    function tryInit() {
+      if (typeof initDynamic === 'function') {
+        initDynamic();
+      } else {
+        requestAnimationFrame(tryInit);
+      }
+    }
+    tryInit();
+
+  } catch(err) {
+    setDataStatusBadge('error', '✗ Error al cargar');
+    showOverlayError(err.message || String(err));
+    console.error('[SAFRESCO Dashboard] Sheet load error:', err);
+  }
+}
+
+// ── Auto-refresh every N minutes ─────────────────────────────
+const AUTO_REFRESH_MINUTES = 5;
+setInterval(() => {
+  if (_dataLoaded) {
+    // Silent background refresh
+    const url = APPS_SCRIPT_URL + '?t=' + Date.now();
+    fetch(url, { cache: 'no-store' })
+      .then(r => r.json())
+      .then(json => {
+        if (!Array.isArray(json) || json.length === 0) return;
+        const mapped = json.map(row => ({
+          client:     String(row.Client     || row.client     || ''),
+          market:     String(row.Market     || row.market     || ''),
+          variety:    String(row.Variety    || row.variety    || ''),
+          subvariety: String(row.Subvariety || row.subvariety || ''),
+          packType:   String(row.Pack_Type  || row.packType   || row.PackType || ''),
+          port:       String(row.Port       || row.port       || ''),
+          packWeek:   parseInt(row.PackWeek || row.packWeek   || 0) || 0,
+          etaWeek:    parseInt(row.ETAWeek  || row.etaWeek    || 0) || 0,
+          size:       String(row['Size Profile'] || row.Size  || row.size || ''),
+          classCode:  String(row.Class      || row.classCode  || ''),
+          volume:     parseFloat(row.Volume || row.volume     || 0) || 0,
+          status:     String(row.Status     || row.status     || ''),
+          fob:        parseFloat(String(row['FOB/TON'] || row.FOB || row.fob || '0').replace(/[^0-9.,]/g,'').replace(',','.')) || 0,
+        })).filter(r => r.client && r.volume > 0);
+        if (mapped.length > 0) {
+          RAW_DATA = mapped;
+          const ts = new Date().toLocaleTimeString('es-ES', { hour:'2-digit', minute:'2-digit' });
+          setDataStatusBadge('ok', `✓ ${mapped.length} filas · ${ts}`);
+          applyFilter();
+        }
+      })
+      .catch(() => {});
+  }
+}, AUTO_REFRESH_MINUTES * 60 * 1000);
+
+</script>
+
+// ============================================================
+// STATE
+// ============================================================
+let currentClient = '__ALL__';
+let currentMode   = 'internal'; // 'internal' | 'client'
+let charts = {};   // holds Chart instances keyed by id
+
+// Palette
+const C = {
+  GREEN:'#006633', LG:'#94C9A9', YELLOW:'#FFD100', RED:'#CC0000',
+  AMBER:'#854F0B', DCEFE4:'#DCEFE4', C8:'#C0D8C8', E8:'#E8F5EE'
+};
+
+// ============================================================
+// HELPERS
+// ============================================================
+function getFiltered(client) {
+  if (client === '__ALL__') return RAW_DATA;
+  return RAW_DATA.filter(r => r.client === client);
+}
+
+function groupBy(arr, key) {
+  const m = {};
+  arr.forEach(r => { m[r[key]] = (m[r[key]] || 0) + r.volume; });
+  return m;
+}
+
+function sortedEntries(obj) {
+  return Object.entries(obj).sort((a,b) => b[1]-a[1]);
+}
+
+function topKey(obj) {
+  const e = sortedEntries(obj);
+  return e.length ? e[0][0] : '—';
+}
+
+function fmtNum(n) { return n.toLocaleString(); }
+
+function allWeeks(key, arr) {
+  const weeks = [...new Set(arr.map(r=>r[key]))].sort((a,b)=>a-b);
+  return weeks;
+}
+
+function mkChartOptions(total, label) {
+  return {
+    responsive:true, maintainAspectRatio:false, animation:{duration:200},
+    plugins:{
+      legend:{display:false},
+      tooltip:{callbacks:{label: ctx => ` ${ctx.parsed.y} pallets (${(ctx.parsed.y/total*100).toFixed(1)}%)`}}
+    },
+    scales:{
+      x:{ticks:{font:{size:8}},grid:{display:false}},
+      y:{ticks:{font:{size:7}},grid:{color:'#f0f0f0'},
+         title:{display:true,text:label||'Pallets',font:{size:7}}}
+    }
+  };
+}
+
+// ============================================================
+// CHART MANAGEMENT — create-or-update
+// ============================================================
+function upsertBarChart(id, labels, data, colors, total) {
+  const ctx = document.getElementById(id);
+  if (!ctx) return;
+  if (charts[id]) {
+    charts[id].data.labels = labels;
+    charts[id].data.datasets[0].data = data;
+    charts[id].data.datasets[0].backgroundColor = colors;
+    charts[id].options.plugins.tooltip.callbacks.label =
+      ctx2 => ` ${ctx2.parsed.y} pallets (${(ctx2.parsed.y/total*100).toFixed(1)}%)`;
+    charts[id].update('none');
+  } else {
+    charts[id] = new Chart(ctx.getContext('2d'), {
+      type:'bar',
+      data:{ labels, datasets:[{label:'Volume',data,backgroundColor:colors,borderRadius:2}] },
+      options: mkChartOptions(total)
+    });
+  }
+}
+
+function upsertDonut(id, labels, data, bgColors, total) {
+  const ctx = document.getElementById(id);
+  if (!ctx) return;
+  if (charts[id]) {
+    charts[id].data.labels = labels;
+    charts[id].data.datasets[0].data = data;
+    charts[id].data.datasets[0].backgroundColor = bgColors;
+    charts[id].update('none');
+  } else {
+    charts[id] = new Chart(ctx.getContext('2d'), {
+      type:'doughnut',
+      data:{ labels, datasets:[{data, backgroundColor:bgColors, borderWidth:1, borderColor:'white'}] },
+      options:{
+        responsive:true, maintainAspectRatio:false, animation:{duration:200},
+        cutout:'62%',
+        plugins:{
+          legend:{
+            display:true, position:'right',
+            labels:{
+              font:{size:7}, boxWidth:10, padding:4,
+              generateLabels: chart => chart.data.labels.map((lbl,i) => ({
+                text:`${lbl}: ${chart.data.datasets[0].data[i]} (${(chart.data.datasets[0].data[i]/total*100).toFixed(1)}%)`,
+                fillStyle: chart.data.datasets[0].backgroundColor[i],
+                strokeStyle:'white', lineWidth:1, index:i
+              }))
+            }
+          },
+          tooltip:{callbacks:{label: ctx2 => ` Size ${ctx2.label}: ${ctx2.parsed} (${(ctx2.parsed/total*100).toFixed(1)}%)`}}
+        }
+      }
+    });
+  }
+}
+
+// ============================================================
+// KPI RENDER
+// ============================================================
+function renderKPIs(rows, total, isAll) {
+  const el = document.querySelector('.kpi-row');
+  if (!el) return;
+
+  const markets = [...new Set(rows.map(r=>r.market))];
+  const clients = [...new Set(rows.map(r=>r.client))];
+  const pwMap = groupBy(rows, 'packWeek');
+  const etaMap = groupBy(rows, 'etaWeek');
+  const peakPW = +topKey(pwMap);
+  const peakETA= +topKey(etaMap);
+  const peakPct = total ? ((pwMap[peakPW]||0)/total*100).toFixed(1) : 0;
+  const peakAmber = parseFloat(peakPct) > 30;
+  const cvMap = groupBy(rows, 'client');
+  const topClient = sortedEntries(cvMap)[0];
+
+  if (isAll) {
+    el.innerHTML = `
+      <div class="kpi"><div class="kpi-label">Total Volume (Pallets)</div><div class="kpi-val">${fmtNum(total)}</div><div class="kpi-sub">All clients · W19–W23</div></div>
+      <div class="kpi"><div class="kpi-label">Active Clients</div><div class="kpi-val">${clients.length}</div><div class="kpi-sub">Across ${markets.length} markets</div></div>
+      <div class="kpi"><div class="kpi-label">Markets</div><div class="kpi-val">${markets.length}</div><div class="kpi-sub">${markets.join(' · ')}</div></div>
+      <div class="kpi ${peakAmber?'amber':''}"><div class="kpi-label">Peak PackWeek</div><div class="kpi-val">W${peakPW}</div><div class="kpi-sub ${peakAmber?'am':''}"><strong>${peakPct}%</strong> of total volume</div></div>
+      <div class="kpi"><div class="kpi-label">Peak ETA Week</div><div class="kpi-val">W${peakETA}</div><div class="kpi-sub">${fmtNum(etaMap[peakETA]||0)} pallets arriving</div></div>
+      <div class="kpi"><div class="kpi-label">Top Client by Volume</div><div class="kpi-val" style="font-size:12px;margin-top:2px;">${topClient?topClient[0]:'—'}</div><div class="kpi-sub">${topClient?fmtNum(topClient[1]):0} pallets · ${topClient?(topClient[1]/total*100).toFixed(1):0}%</div></div>
+    `;
+  } else {
+    const clientName = clients[0] || '—';
+    const clientMarkets = [...new Set(rows.map(r=>r.market))].join(', ');
+    const mainSize = topKey(groupBy(rows,'size'));
+    const ports = [...new Set(rows.map(r=>r.port))].join(', ');
+    el.innerHTML = `
+      <div class="kpi"><div class="kpi-label">Total Volume</div><div class="kpi-val">${fmtNum(total)}</div><div class="kpi-sub">${clientName} · W19–W23</div></div>
+      <div class="kpi"><div class="kpi-label">Markets Covered</div><div class="kpi-val" style="font-size:13px;">${clientMarkets}</div><div class="kpi-sub">${markets.length} market${markets.length>1?'s':''}</div></div>
+      <div class="kpi ${peakAmber?'amber':''}"><div class="kpi-label">Main PackWeek</div><div class="kpi-val">W${peakPW}</div><div class="kpi-sub ${peakAmber?'am':''}">${peakPct}% of client volume</div></div>
+      <div class="kpi"><div class="kpi-label">Main ETA Week</div><div class="kpi-val">W${peakETA}</div><div class="kpi-sub">${fmtNum(etaMap[peakETA]||0)} pallets</div></div>
+      <div class="kpi"><div class="kpi-label">Main Size</div><div class="kpi-val">${mainSize}</div><div class="kpi-sub">Primary size code</div></div>
+      <div class="kpi"><div class="kpi-label">Port(s)</div><div class="kpi-val" style="font-size:11px;margin-top:2px;">${ports}</div><div class="kpi-sub">Discharge port</div></div>
+    `;
+  }
+}
+
+// ============================================================
+
+
+// ============================================================
+// SIZE HELPERS
+// ============================================================
+const NUMERIC_ORDER = ['1','2','3','4'];
+const JUMBO_ORDER   = ['1x','1xx','1xxx'];
+
+function sortSizes(keys) {
+  return [
+    ...NUMERIC_ORDER.filter(k => keys.includes(k)),
+    ...JUMBO_ORDER.filter(k => keys.includes(k)),
+    ...keys.filter(k => !NUMERIC_ORDER.includes(k) && !JUMBO_ORDER.includes(k)).sort()
+  ];
+}
+
+// Build a compact size-range label from an array of size strings for a row group.
+// e.g. ['2','3','4'] → 'Size 2–4'
+//      ['1'] → 'Size 1'
+//      ['1xx','1xxx'] → 'Size 1xx–1xxx'
+//      ['1xxx - 2'] → 'Size 1xxx-2'    (verbatim profile string)
+function sizeRangeLabel(sizes) {
+  if (!sizes || sizes.length === 0) return '';
+  const clean = sizes.filter(s => s && s !== '' && s !== 'undefined');
+  if (clean.length === 0) return '';
+  if (clean.length === 1) return `Size ${clean[0]}`;
+
+  // Check if all are plain numeric
+  const allNumeric = clean.every(s => NUMERIC_ORDER.includes(s));
+  if (allNumeric) {
+    const nums = clean.map(Number).sort((a,b)=>a-b);
+    const min = nums[0], max = nums[nums.length-1];
+    return min === max ? `Size ${min}` : `Size ${min}–${max}`;
+  }
+
+  // Check if all are jumbo
+  const allJumbo = clean.every(s => JUMBO_ORDER.includes(s));
+  if (allJumbo) {
+    const ordered = JUMBO_ORDER.filter(k => clean.includes(k));
+    if (ordered.length === 1) return `Size ${ordered[0]}`;
+    return `Size ${ordered[0]}–${ordered[ordered.length-1]}`;
+  }
+
+  // Profile strings (e.g. "1xxx - 2") — show first if just one
+  if (clean.length === 1) return `Size ${clean[0]}`;
+
+  // Mixed: list them all (compact, comma-separated)
+  return `Size ${clean.join(', ')}`;
+}
+
+// ============================================================
+// CONSOLIDATED CLIENT VIEW — replaces renderClientPanel + renderClientProgramGrid
+// ============================================================
+function renderClientView(rows, total, clientName) {
+  const panel = document.getElementById('clientViewPanel');
+  if (!panel) return;
+
+  if (!clientName || clientName === '__ALL__') {
+    panel.style.display = 'none';
+    return;
+  }
+  panel.style.display = 'block';
+
+  // ── strip header ─────────────────────────────────────────
+  const markets  = [...new Set(rows.map(r => r.market))].join(' · ');
+  const ports    = [...new Set(rows.map(r => r.port))].join(', ');
+  const etaMap   = groupBy(rows, 'etaWeek');
+  const pwMap    = groupBy(rows, 'packWeek');
+  const etaWeeks = Object.keys(etaMap).map(Number).sort((a,b)=>a-b);
+  const peakETA  = +topKey(etaMap);
+
+  const stripTitle = document.getElementById('cvStripTitle');
+  const stripSub   = document.getElementById('cvStripSub');
+  const stripBadge = document.getElementById('cvStripBadge');
+  const varieties  = [...new Set(rows.map(r => r.variety).filter(Boolean))].join(', ');
+  const subvars    = [...new Set(rows.map(r => r.subvariety).filter(Boolean))].join(', ');
+  const titleVar   = subvars || varieties || 'Programme';
+  if (stripTitle) stripTitle.textContent = `${clientName} · ${titleVar} · 2026`;
+  if (stripSub)   stripSub.textContent =
+    `${markets} · ${ports} · ${fmtNum(total)} Pallets · W${etaWeeks[0]}–W${etaWeeks[etaWeeks.length-1]} ETA`;
+  if (stripBadge) stripBadge.textContent = 'DRAFT PROGRAMME';
+
+  // ── KPI mini strip ────────────────────────────────────────
+  const peakPW  = +topKey(pwMap);
+  const sizeMap = groupBy(rows, 'size');
+  const topSz   = topKey(sizeMap);
+  const kpiEl   = document.getElementById('cvKpiStrip');
+  if (kpiEl) kpiEl.innerHTML = `
+    <div class="cv-kpi-mini">
+      <div class="lbl">Total Volume</div>
+      <div class="val">${fmtNum(total)}</div>
+      <div class="sub">Pallets · 2026</div>
+    </div>
+    <div class="cv-kpi-mini">
+      <div class="lbl">Market(s)</div>
+      <div class="val" style="font-size:10px;line-height:1.2;">${markets}</div>
+      <div class="sub">Destination</div>
+    </div>
+    <div class="cv-kpi-mini">
+      <div class="lbl">Pack Weeks</div>
+      <div class="val">W${Math.min(...Object.keys(pwMap).map(Number))}–W${Math.max(...Object.keys(pwMap).map(Number))}</div>
+      <div class="sub">${Object.keys(pwMap).length} active</div>
+    </div>
+    <div class="cv-kpi-mini">
+      <div class="lbl">Peak ETA Week</div>
+      <div class="val">W${peakETA}</div>
+      <div class="sub">${fmtNum(etaMap[peakETA]||0)} pallets</div>
+    </div>
+    <div class="cv-kpi-mini">
+      <div class="lbl">Port(s)</div>
+      <div class="val" style="font-size:9px;line-height:1.3;">${ports}</div>
+      <div class="sub">Discharge</div>
+    </div>
+    <div class="cv-kpi-mini">
+      <div class="lbl">ETA Window</div>
+      <div class="val" style="font-size:10px;">W${etaWeeks[0]}–W${etaWeeks[etaWeeks.length-1]}</div>
+      <div class="sub">${etaWeeks.length} ETA weeks</div>
+    </div>
+  `;
+
+  // ── Build consolidated row groups ─────────────────────────
+  // Row key = Variety | Subvariety | Class | SizeRange
+  // Group rows into buckets by (subvariety, classCode, sizeGroup)
+
+  // First pass: determine size grouping per (subv, class) combination
+  // A "size group" = all sizes used for that subv+class combo → range label
+  const rowBuckets = {};  // key → {rows:[]}
+
+  rows.forEach(r => {
+    const subv  = (r.subvariety && r.subvariety !== '' && r.subvariety !== 'undefined') ? r.subvariety : r.variety;
+    const cls   = (r.classCode  && r.classCode  !== '' && r.classCode  !== 'undefined') ? r.classCode  : null;
+    const ptype = (r.packType   && r.packType   !== '' && r.packType   !== 'undefined') ? r.packType   : null;
+    // include packType in bucket key so rows with different pack types stay separate
+    const bucketKey = `${subv}|||${ptype||''}|||${cls||''}`;
+    if (!rowBuckets[bucketKey]) rowBuckets[bucketKey] = { subv, cls, ptype, rows: [] };
+    rowBuckets[bucketKey].rows.push(r);
+  });
+
+  // For each bucket, compute size range from its sizes
+  // Then build sub-buckets if sizes need to be split (e.g. numeric vs jumbo)
+  // Strategy: if a bucket has ONLY numeric sizes or ONLY jumbo, keep as one row.
+  // If it has mixed (e.g. Nova FE1 has numeric AND jumbo → split into two rows)
+  const finalRows = []; // {label, etaVols:{week:vol}, rowTotal, firstETA}
+
+  Object.values(rowBuckets).forEach(bucket => {
+    const { subv, cls, ptype, rows: bRows } = bucket;
+
+    // Gather sizes
+    const sizesInBucket = [...new Set(bRows.map(r => r.size).filter(s => s && s !== '' && s !== 'undefined'))];
+    const hasNumeric = sizesInBucket.some(s => NUMERIC_ORDER.includes(s));
+    const hasJumbo   = sizesInBucket.some(s => JUMBO_ORDER.includes(s));
+    const hasOther   = sizesInBucket.some(s => !NUMERIC_ORDER.includes(s) && !JUMBO_ORDER.includes(s));
+
+    let subBuckets;
+
+    if ((hasNumeric && hasJumbo) || (hasNumeric && hasOther) || (hasJumbo && hasOther)) {
+      // Split into sub-buckets by size group type
+      const numericRows = bRows.filter(r => NUMERIC_ORDER.includes(r.size));
+      const jumboRows   = bRows.filter(r => JUMBO_ORDER.includes(r.size));
+      const otherRows   = bRows.filter(r => r.size && !NUMERIC_ORDER.includes(r.size) && !JUMBO_ORDER.includes(r.size));
+      const noSzRows    = bRows.filter(r => !r.size || r.size === '');
+
+      subBuckets = [];
+      if (numericRows.length) subBuckets.push({ rows: numericRows, sizes: [...new Set(numericRows.map(r=>r.size))] });
+      if (jumboRows.length)   subBuckets.push({ rows: jumboRows,   sizes: [...new Set(jumboRows.map(r=>r.size))]   });
+      if (otherRows.length)   subBuckets.push({ rows: otherRows,   sizes: [...new Set(otherRows.map(r=>r.size))]   });
+      if (noSzRows.length)    subBuckets.push({ rows: noSzRows,    sizes: [] });
+    } else {
+      subBuckets = [{ rows: bRows, sizes: sizesInBucket }];
+    }
+
+    subBuckets.forEach(({ rows: sbRows, sizes }) => {
+      // Build label — include Pack Type between subvariety and Class
+      const szLabel  = sizeRangeLabel(sortSizes(sizes));
+      let label = subv;
+      if (ptype) label += ` · ${ptype}`;
+      if (cls)   label += ` · Class ${cls}`;
+      if (szLabel) label += ` · ${szLabel}`;
+
+      // Aggregate ETA volumes
+      const etaVols = {};
+      sbRows.forEach(r => {
+        etaVols[r.etaWeek] = (etaVols[r.etaWeek] || 0) + r.volume;
+      });
+      const rowTotal = sbRows.reduce((s,r) => s+r.volume, 0);
+      // Earliest ETA week with non-zero volume for this row
+      const firstETA = Math.min(...sbRows.map(r => r.etaWeek));
+
+      finalRows.push({ label, etaVols, rowTotal, firstETA });
+    });
+  });
+
+  // Sort by firstETA ascending (chronological programme start order).
+  // Tie-break: keep stable within same firstETA using original insertion order (Array.sort is stable in ES2019+).
+  finalRows.sort((a, b) => a.firstETA - b.firstETA);
+
+  // All ETA weeks across this client
+  const allWeeks = [...new Set(rows.map(r => r.etaWeek))].sort((a,b)=>a-b);
+
+  // Column totals
+  const colTotals = {};
+  allWeeks.forEach(w => { colTotals[w] = 0; });
+  finalRows.forEach(fr => {
+    allWeeks.forEach(w => { colTotals[w] += (fr.etaVols[w] || 0); });
+  });
+  const grandTotal = allWeeks.reduce((s,w) => s + (colTotals[w]||0), 0);
+
+  // Update subtitle
+  const cptSub = document.getElementById('cvCptSubtitle');
+  if (cptSub) cptSub.textContent = `${allWeeks.length} ETA Weeks · ${fmtNum(grandTotal)} Pallets Total`;
+
+  // Fixed column width so every column aligns perfectly (Excel-style grid)
+  const wkColPx = 46; // px per ETA week column — uniform width
+  const specColPx = 220; // Programme Specification column
+
+  // Build table HTML — NO peak highlights in client view, uniform cell colour
+  let html = `<colgroup><col style="width:${specColPx}px;min-width:${specColPx}px;">`;
+  allWeeks.forEach(() => { html += `<col style="width:${wkColPx}px;min-width:${wkColPx}px;">`; });
+  html += `<col style="width:52px;min-width:52px;"></colgroup>`;
+
+  html += '<thead><tr>';
+  html += '<th class="cpt-row-hdr">Programme Specification</th>';
+  allWeeks.forEach(w => {
+    html += `<th>ETA W${w}</th>`;
+  });
+  html += '<th class="cpt-total-hdr">Total</th>';
+  html += '</tr></thead><tbody>';
+
+  finalRows.forEach(fr => {
+    html += '<tr>';
+    html += `<td class="cpt-row-hdr">${fr.label}</td>`;
+    allWeeks.forEach(w => {
+      const val = fr.etaVols[w] || 0;
+      const cls = val === 0 ? 'cpt-empty' : 'cpt-active';   // no peak in client view
+      html += `<td class="${cls}">${val === 0 ? '—' : fmtNum(val)}</td>`;
+    });
+    html += `<td class="cpt-total-col">${fmtNum(fr.rowTotal)}</td>`;
+    html += '</tr>';
+  });
+
+  // Total row — no peak highlight
+  html += '<tr class="cpt-total-row">';
+  html += '<td class="cpt-row-hdr">TOTAL</td>';
+  allWeeks.forEach(w => {
+    html += `<td>${fmtNum(colTotals[w] || 0)}</td>`;
+  });
+  html += `<td class="cpt-total-col">${fmtNum(grandTotal)}</td>`;
+  html += '</tr>';
+  html += '</tbody>';
+
+  const cptTbl = document.getElementById('cvCptTable');
+  if (cptTbl) cptTbl.innerHTML = html;
+}
+
+// ============================================================
+// ALL CLIENTS INTERNAL MATRIX — Client × ETAWeek
+// ============================================================
+function renderAllClientsMatrix(rows, total) {
+  const container = document.getElementById('allClientsMatrix');
+  const tbl       = document.getElementById('acmTable');
+  const sub       = document.getElementById('acmSubtitle');
+  if (!container || !tbl) return;
+
+  // Only show in Internal view when All Clients
+  if (currentClient !== '__ALL__' || currentMode === 'client') {
+    container.style.display = 'none';
+    return;
+  }
+  container.style.display = 'block';
+
+  // Gather clients sorted by total volume desc
+  const clientVols = {};
+  const clientMkts = {};
+  rows.forEach(r => {
+    clientVols[r.client] = (clientVols[r.client] || 0) + r.volume;
+    if (!clientMkts[r.client]) clientMkts[r.client] = new Set();
+    clientMkts[r.client].add(r.market);
+  });
+  const sortedClients = Object.entries(clientVols).sort((a,b)=>b[1]-a[1]).map(([c])=>c);
+
+  // ETA weeks
+  const etaMap = groupBy(rows, 'etaWeek');
+  const allWeeks = Object.keys(etaMap).map(Number).sort((a,b)=>a-b);
+
+  // Matrix
+  const matrix = {};
+  rows.forEach(r => {
+    if (!matrix[r.client]) matrix[r.client] = {};
+    matrix[r.client][r.etaWeek] = (matrix[r.client][r.etaWeek] || 0) + r.volume;
+  });
+
+  // Col totals
+  const colTotals = {};
+  allWeeks.forEach(w => {
+    colTotals[w] = sortedClients.reduce((s,c) => s + (matrix[c]?.[w] || 0), 0);
+  });
+  const grandTotal = allWeeks.reduce((s,w) => s+(colTotals[w]||0), 0);
+  const peakWeek   = allWeeks.reduce((best,w) => (colTotals[w]||0) > (colTotals[best]||0) ? w : best, allWeeks[0]);
+
+  if (sub) sub.textContent = `${sortedClients.length} clients · ${fmtNum(grandTotal)} pallets`;
+
+  let html = '<thead><tr>';
+  html += '<th class="cpt-row-hdr">Client</th>';
+  html += '<th style="text-align:left;min-width:55px;">Market</th>';
+  allWeeks.forEach(w => {
+    const isPeak = (w === peakWeek);
+    html += `<th class="${isPeak ? 'cpt-peak-hdr' : ''}">W${w}</th>`;
+  });
+  html += '<th class="cpt-total-hdr">Total</th>';
+  html += '</tr></thead><tbody>';
+
+  sortedClients.forEach(client => {
+    const mkts = [...clientMkts[client]].join('/');
+    html += '<tr>';
+    html += `<td class="cpt-row-hdr">${client}</td>`;
+    html += `<td style="font-size:7px;color:#558866;">${mkts}</td>`;
+    allWeeks.forEach(w => {
+      const val = matrix[client]?.[w] || 0;
+      const isPeak = (w === peakWeek) && val > 0;
+      const cls = val === 0 ? 'cpt-empty' : isPeak ? 'cpt-peak' : 'cpt-active';
+      html += `<td class="${cls}">${val === 0 ? '—' : fmtNum(val)}</td>`;
+    });
+    html += `<td class="cpt-total-col">${fmtNum(clientVols[client])}</td>`;
+    html += '</tr>';
+  });
+
+  // Total row
+  html += '<tr class="cpt-total-row">';
+  html += '<td class="cpt-row-hdr">TOTAL</td><td></td>';
+  allWeeks.forEach(w => {
+    const val = colTotals[w] || 0;
+    const isPeak = (w === peakWeek);
+    html += `<td class="${isPeak ? 'cpt-total-col' : ''}">${fmtNum(val)}</td>`;
+  });
+  html += `<td class="cpt-total-col">${fmtNum(grandTotal)}</td>`;
+  html += '</tr></tbody>';
+
+  tbl.innerHTML = html;
+}
+
+
+// ============================================================
+// CLASS & SIZE PROFILE SUMMARY — both All Clients and Client View
+// ============================================================
+function renderClassSizeSection(rows, total) {
+  const section = document.getElementById('classSizeSection');
+  if (!section) return;
+  // Section stays hidden by default — do not force display:block
+  // Only render content into it so it's ready if explicitly shown
+
+  // ── CLASS ─────────────────────────────────────────────────
+  const classBody    = document.getElementById('classBody');
+  const classSub     = document.getElementById('classSubtitle');
+  const classMap     = {};
+  let   hasClass     = false;
+
+  rows.forEach(r => {
+    const cls = (r.classCode && r.classCode !== '' && r.classCode !== 'undefined')
+                 ? r.classCode : null;
+    if (cls) {
+      hasClass = true;
+      classMap[cls] = (classMap[cls] || 0) + r.volume;
+    }
+  });
+
+  if (!hasClass) {
+    classBody.innerHTML = '<div class="cs-na">Data not available in source file</div>';
+    if (classSub) classSub.textContent = '';
+  } else {
+    const clsSorted = sortedEntries(classMap);
+    const clsGrand  = clsSorted.reduce((s,[,v]) => s+v, 0);
+    const peakCls   = clsSorted[0][0];
+    if (classSub) classSub.textContent = `${clsSorted.length} class${clsSorted.length>1?'es':''} · ${fmtNum(clsGrand)} pallets`;
+
+    let html = '<table class="cs-table"><thead><tr>'
+             + '<th>Class</th><th>Volume</th><th>Share %</th><th>Bar</th>'
+             + '</tr></thead><tbody>';
+
+    clsSorted.forEach(([cls, vol]) => {
+      const pct  = (vol / clsGrand * 100).toFixed(1);
+      const isPeak = cls === peakCls;
+      html += `<tr>
+        <td class="cs-name">${cls}</td>
+        <td>${fmtNum(vol)}</td>
+        <td>${pct}%</td>
+        <td class="cs-peak-bar"><div class="cs-bar-wrap"><div class="cs-bar${isPeak?' cs-bar-peak':''}" style="width:${pct}%"></div></div></td>
+      </tr>`;
+    });
+
+    if (clsSorted.length > 1) {
+      html += `<tr class="cs-total">
+        <td class="cs-name">TOTAL</td>
+        <td>${fmtNum(clsGrand)}</td>
+        <td>100%</td>
+        <td></td>
+      </tr>`;
+    }
+    html += '</tbody></table>';
+    classBody.innerHTML = html;
+  }
+
+  // ── SIZE PROFILE ──────────────────────────────────────────
+  const sizeBody  = document.getElementById('sizeBody');
+  const sizeSub   = document.getElementById('sizeSubtitle');
+
+  // Bucket sizes into logical groups while preserving exact commercial codes.
+  // Numeric sizes 1–4 stay individual. Jumbo/OOC codes (1x, 1xx, 1xxx) stay individual.
+  // Size Profile strings (e.g. "1xxx - 2") stay as-is.
+  const rawSizeMap = {};
+  rows.forEach(r => {
+    const s = (r.size && r.size !== '' && r.size !== 'undefined') ? r.size : '(no size)';
+    rawSizeMap[s] = (rawSizeMap[s] || 0) + r.volume;
+  });
+
+  // Sort: numeric first ascending, then alpha
+  const numericSizes = ['1','2','3','4'];
+  const jumboOrder   = ['1x','1xx','1xxx'];
+  const allSizeKeys  = Object.keys(rawSizeMap);
+
+  const orderedKeys = [
+    ...numericSizes.filter(k => allSizeKeys.includes(k)),
+    ...jumboOrder.filter(k => allSizeKeys.includes(k)),
+    ...allSizeKeys.filter(k => !numericSizes.includes(k) && !jumboOrder.includes(k)).sort()
+  ];
+
+  const szGrand = orderedKeys.reduce((s,k) => s + (rawSizeMap[k]||0), 0);
+  const peakSz  = orderedKeys.length > 0
+                  ? orderedKeys.reduce((best,k) => (rawSizeMap[k]||0) > (rawSizeMap[best]||0) ? k : best, orderedKeys[0])
+                  : null;
+
+  if (sizeSub) sizeSub.textContent = `${orderedKeys.length} size code${orderedKeys.length!==1?'s':''} · ${fmtNum(szGrand)} pallets`;
+
+  // Check if we can show a meaningful numeric range note
+  const numericPresent = numericSizes.filter(k => allSizeKeys.includes(k));
+  let rangeNote = '';
+  if (numericPresent.length >= 3) {
+    rangeNote = `<div style="font-size:6.5px;color:#558866;padding:2px 8px 3px;border-top:1px solid #E8F0EC;">
+      Numeric sizes ${numericPresent[0]}–${numericPresent[numericPresent.length-1]} cover standard commercial grades.
+    </div>`;
+  }
+
+  let szHtml = '<table class="cs-table"><thead><tr>'
+             + '<th>Size / Profile</th><th>Volume</th><th>Share %</th><th>Bar</th>'
+             + '</tr></thead><tbody>';
+
+  orderedKeys.forEach(k => {
+    const vol = rawSizeMap[k] || 0;
+    const pct = szGrand ? (vol / szGrand * 100).toFixed(1) : '0.0';
+    const isPeak    = k === peakSz;
+    // Special colour for jumbo/OOC
+    const isJumbo   = jumboOrder.includes(k) || k.includes('xxx') || k.includes('xx');
+    const barClass  = isPeak ? 'cs-bar-peak' : isJumbo ? 'cs-bar-special' : '';
+    const nameStyle = isJumbo ? 'color:#854F0B;font-weight:700;' : '';
+    szHtml += `<tr>
+      <td class="cs-name" style="${nameStyle}">${k === '(no size)' ? '<em style="color:#aaa;">not specified</em>' : k}</td>
+      <td>${fmtNum(vol)}</td>
+      <td>${pct}%</td>
+      <td class="cs-peak-bar"><div class="cs-bar-wrap"><div class="cs-bar ${barClass}" style="width:${pct}%"></div></div></td>
+    </tr>`;
+  });
+
+  if (orderedKeys.length > 1) {
+    szHtml += `<tr class="cs-total">
+      <td class="cs-name">TOTAL</td>
+      <td>${fmtNum(szGrand)}</td>
+      <td>100%</td>
+      <td></td>
+    </tr>`;
+  }
+  szHtml += '</tbody></table>';
+  if (rangeNote) szHtml += rangeNote;
+  sizeBody.innerHTML = szHtml;
+}
+
+// ============================================================
+// WEEKLY CHARTS
+// ============================================================
+function renderWeeklyCharts(rows, total) {
+  // PackWeek
+  const pwMap = groupBy(rows,'packWeek');
+  const pwKeys = Object.keys(pwMap).map(Number).sort((a,b)=>a-b);
+  const pwVals = pwKeys.map(k=>pwMap[k]);
+  const maxPW  = Math.max(...pwVals);
+  upsertBarChart('chartPackWeek',
+    pwKeys.map(w=>'W'+w), pwVals,
+    pwVals.map(v=>v===maxPW?C.YELLOW:C.GREEN), total);
+
+  // ETAWeek
+  const etaMap = groupBy(rows,'etaWeek');
+  const etaKeys= Object.keys(etaMap).map(Number).sort((a,b)=>a-b);
+  const etaVals= etaKeys.map(k=>etaMap[k]);
+  const maxETA = Math.max(...etaVals);
+  upsertBarChart('chartETAWeek',
+    etaKeys.map(w=>'W'+w), etaVals,
+    etaVals.map(v=>v===maxETA?C.YELLOW:C.LG), total);
+}
+
+// ============================================================
+// CLIENT BREAKDOWN TABLE
+// ============================================================
+function renderClientTable(rows, total) {
+  const tbody = document.querySelector('#clientBreakdownTable tbody');
+  if (!tbody) return;
+  tbody.innerHTML = '';
+
+  // Group by client
+  const clientMap = {};
+  rows.forEach(r => {
+    if (!clientMap[r.client]) clientMap[r.client] = {vol:0,markets:new Set(),pwks:new Set(),sizes:new Set()};
+    clientMap[r.client].vol += r.volume;
+    clientMap[r.client].markets.add(r.market);
+    clientMap[r.client].pwks.add(r.packWeek);
+    clientMap[r.client].sizes.add(r.size);
+  });
+  const sorted = Object.entries(clientMap).sort((a,b)=>b[1].vol-a[1].vol);
+  sorted.forEach(([client, d]) => {
+    const share = total ? (d.vol/total*100).toFixed(1) : 0;
+    const szArr = [...d.sizes].join(', ');
+    const mktArr = [...d.markets].join('/');
+    const pct = parseFloat(share);
+    const barColor = pct>=40?'red':pct>=30?'amber':'';
+    tbody.innerHTML += `
+      <tr>
+        <td><strong>${client}</strong></td>
+        <td>${mktArr}</td>
+        <td>${fmtNum(d.vol)}</td>
+        <td>${share}%</td>
+        <td><div class="prog-bar-wrap"><div class="prog-bar ${barColor}" style="width:${Math.min(share,100)}%"></div></div></td>
+        <td>${szArr}</td>
+      </tr>`;
+  });
+  // Total row
+  tbody.innerHTML += `
+    <tr style="background:#E8F5EE;">
+      <td><strong>TOTAL</strong></td>
+      <td>${[...new Set(rows.map(r=>r.market))].join('/')}</td>
+      <td><strong>${fmtNum(total)}</strong></td>
+      <td><strong>100%</strong></td>
+      <td><div class="prog-bar-wrap"><div class="prog-bar" style="width:100%"></div></div></td>
+      <td>Full mix</td>
+    </tr>`;
+}
+
+// ============================================================
+// MARKET FOCUS BLOCKS
+// ============================================================
+function renderMarketFocus(rows, total) {
+  const container = document.getElementById('marketFocusContainer');
+  if (!container) return;
+  container.innerHTML = '';
+
+  const marketMap = {};
+  rows.forEach(r => {
+    if (!marketMap[r.market]) marketMap[r.market]={vol:0,clients:{},pwks:{},etaks:{},sizes:{}};
+    const m = marketMap[r.market];
+    m.vol += r.volume;
+    m.clients[r.client]=(m.clients[r.client]||0)+r.volume;
+    m.pwks[r.packWeek]=(m.pwks[r.packWeek]||0)+r.volume;
+    m.etaks[r.etaWeek]=(m.etaks[r.etaWeek]||0)+r.volume;
+    m.sizes[r.size]=(m.sizes[r.size]||0)+r.volume;
+  });
+
+  const mktOrder = Object.entries(marketMap).sort((a,b)=>b[1].vol-a[1].vol);
+  const mktColors = {'India':'#006633','SEA':'#7A6000','BGD':'#558866'};
+  const mktFlags  = {'India':'🇮🇳','SEA':'🌏','BGD':'🇧🇩','China':'🇨🇳','HK':'🇭🇰','AF':'🇬🇭'};
+  const mktClass  = {'India':'india','SEA':'sea','BGD':'bgd'};
+
+  mktOrder.forEach(([mkt, d]) => {
+    const share = total ? (d.vol/total*100).toFixed(1) : 0;
+    const cls   = mktClass[mkt]||'';
+    const isPriority = mkt === 'India';
+    container.innerHTML += `
+      <div class="market-block ${cls}">
+        <div class="market-title">${mktFlags[mkt]||'🌐'} ${mkt} &nbsp;·&nbsp; ${fmtNum(d.vol)} Pallets &nbsp;·&nbsp; ${share}%${isPriority?' &nbsp;|&nbsp; ⭐ Priority Market':''}</div>
+      </div>`;
+  });
+}
+
+// ============================================================
+// SIZE MIX
+// ============================================================
+function renderSizeMix(rows, total) {
+  const sizeMap  = {};
+  rows.forEach(r=>{ sizeMap[r.size]=(sizeMap[r.size]||0)+r.volume; });
+  const sorted   = sortedEntries(sizeMap);
+  const labels   = sorted.map(e=>e[0]);
+  const vals     = sorted.map(e=>e[1]);
+  const palette  = [C.GREEN,C.LG,C.YELLOW,C.DCEFE4,C.AMBER,'#C0D8C8','#E8F5EE'];
+  upsertDonut('chartSizeMix', labels, vals, palette.slice(0,labels.length), total);
+
+  // Table
+  const tbl = document.getElementById('sizeMixTable');
+  if (tbl) {
+    let html = '<thead><tr><th>Size</th><th>Volume</th><th>Share %</th><th>Bar</th></tr></thead><tbody>';
+    sorted.forEach(([s,v])=>{
+      const pct=(v/total*100).toFixed(1);
+      const bc= +s>='1xx'||isNaN(+s) ? 'amber' : '';
+      html+=`<tr><td><strong>${s}</strong></td><td>${v}</td><td>${pct}%</td><td><div class="prog-bar-wrap"><div class="prog-bar ${bc}" style="width:${pct}%"></div></div></td></tr>`;
+    });
+    html+='</tbody>';
+    tbl.innerHTML = html;
+  }
+}
+
+// ============================================================
+// RISKS & ALERTS
+// ============================================================
+function renderAlerts(rows, total, isAll) {
+  const container = document.getElementById('alertsContainer');
+  if (!container) return;
+
+  if (!isAll && currentMode==='client') { container.innerHTML=''; return; }
+
+  const pwMap = groupBy(rows,'packWeek');
+  const peakPW= +topKey(pwMap);
+  const peakPct= total ? (pwMap[peakPW]/total*100).toFixed(1) : 0;
+  const peakHigh= parseFloat(peakPct)>30;
+
+  const mktMap = groupBy(rows,'market');
+  const topMkt = topKey(mktMap);
+  const topMktPct= total ? (mktMap[topMkt]/total*100).toFixed(1) : 0;
+  const mktHigh = parseFloat(topMktPct) > 50;
+
+  const cvMap = groupBy(rows,'client');
+  const topClient = sortedEntries(cvMap)[0];
+  const topClientPct = topClient && total ? (topClient[1]/total*100).toFixed(1) : 0;
+  const clientHigh  = parseFloat(topClientPct) >= 40;
+
+  // Single-client markets
+  const clientsPerMkt = {};
+  rows.forEach(r=>{ if (!clientsPerMkt[r.market]) clientsPerMkt[r.market]=new Set(); clientsPerMkt[r.market].add(r.client); });
+  const singleClientMkts = Object.entries(clientsPerMkt).filter(([,s])=>s.size===1).map(([m])=>m);
+
+  let html = '<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">';
+  let left='', right='';
+
+  // W21/peak concentration
+  if (peakHigh) {
+    left+=`<div class="alert-box amber"><strong>⚠ CAUTION — W${peakPW} Volume Concentration (${peakPct}%)</strong><br>PackWeek ${peakPW} accounts for <strong>${pwMap[peakPW]} of ${fmtNum(total)} pallets (${peakPct}%)</strong> — above the 30% threshold. Review capacity across adjacent weeks to smooth the programme.</div>`;
+  } else {
+    left+=`<div class="alert-box green"><strong>✅ STABLE — Peak Week W${peakPW} (${peakPct}%)</strong><br>Peak week concentration is below the 30% caution threshold for this selection.</div>`;
+  }
+
+  // Market dominance
+  if (mktHigh) {
+    right+=`<div class="alert-box amber"><strong>⚠ CAUTION — ${topMkt} Market Dominance (${topMktPct}%)</strong><br>${topMkt} represents <strong>${topMktPct}%</strong> of selected volume. Monitor border clearance and cold chain at Nhava Sheva.</div>`;
+  } else if (Object.keys(mktMap).length > 0) {
+    right+=`<div class="alert-box green"><strong>✅ STABLE — Market Distribution</strong><br>Top market (${topMkt}) holds ${topMktPct}% — within acceptable concentration range.</div>`;
+  }
+
+  // Single-client per market
+  if (singleClientMkts.length > 0 && isAll) {
+    left+=`<div class="alert-box amber"><strong>⚠ CAUTION — Single Client per Market</strong><br>${singleClientMkts.map(m=>`${m}: 100% single-client dependent`).join('. ')}. No programme redundancy in place.</div>`;
+  }
+
+  // Top client >40%
+  if (clientHigh && topClient) {
+    right+=`<div class="alert-box red"><strong>🚨 CRITICAL — ${topClient[0]} Exceeds 40% (${topClientPct}%)</strong><br>Single client holds <strong>${topClientPct}%</strong> of selected volume, exceeding the 40% concentration flag threshold.</div>`;
+  } else if (topClient) {
+    right+=`<div class="alert-box green"><strong>✅ STABLE — Client Concentration Below 40%</strong><br>Top client ${topClient[0]} holds ${topClientPct}% of selected volume.</div>`;
+  }
+
+
+  // Status summary
+  const statusMap = {};
+  rows.forEach(r => { if(r.status) statusMap[r.status]=(statusMap[r.status]||0)+r.volume; });
+  if (Object.keys(statusMap).length > 0) {
+    const confirmedVol = statusMap['Confirmed']||0;
+    const confirmedPct = total ? (confirmedVol/total*100).toFixed(1) : 0;
+    const highVol = statusMap['High']||0;
+    right += `<div class="alert-box green"><strong>📋 STATUS TRACKING</strong><br>` +
+      Object.entries(statusMap).sort((a,b)=>b[1]-a[1]).map(([s,v])=>
+        `<strong>${s}:</strong> ${fmtNum(v)} pal (${(v/total*100).toFixed(1)}%)`
+      ).join(' &nbsp;·&nbsp; ') + '</div>';
+  }
+
+  html += `<div>${left}</div><div>${right}</div></div>`;
+  container.innerHTML = html;
+}
+
+// ============================================================
+// INSIGHTS & RECOMMENDATIONS
+// ============================================================
+function renderInsights(rows, total, clientName) {
+  const insEl = document.getElementById('insightsContainer');
+  const recEl = document.getElementById('recsContainer');
+  if (!insEl || !recEl) return;
+
+  const mktMap = groupBy(rows,'market');
+  const pwMap  = groupBy(rows,'packWeek');
+  const peakPW = +topKey(pwMap);
+  const peakPct= total ? (pwMap[peakPW]/total*100).toFixed(1) : 0;
+  const cvMap  = groupBy(rows,'client');
+  const topMkt = topKey(mktMap);
+  const topMktPct= total ? (mktMap[topMkt]/total*100).toFixed(1) : 0;
+  const topClient= sortedEntries(cvMap)[0];
+  const clientsPerMkt = {};
+  rows.forEach(r=>{ if(!clientsPerMkt[r.market])clientsPerMkt[r.market]=new Set(); clientsPerMkt[r.market].add(r.client); });
+  const singleClientMkts = Object.entries(clientsPerMkt).filter(([,s])=>s.size===1).map(([m])=>m);
+  const uniqueClients = [...new Set(rows.map(r=>r.client))];
+  const markets = [...new Set(rows.map(r=>r.market))];
+
+  let ins1, ins2, ins3, rec1, rec2, rec3;
+
+  if (!clientName || clientName==='__ALL__') {
+    const varieties    = [...new Set(rows.map(r=>r.variety).filter(Boolean))];
+    const subvFilter   = currentSubvariety !== '__ALL__' ? ` (${currentSubvariety})` : '';
+    const varLabel     = varieties.length === 1 ? varieties[0] : varieties.join(', ');
+    ins1 = `${topMkt} leads at ${topMktPct}% of volume across ${uniqueClients.filter(c=>rows.find(r=>r.client===c&&r.market===topMkt)).length} buyers — primary market for ${varLabel}${subvFilter}.`;
+    ins2 = `W${peakPW} peak at ${peakPct}% — ${parseFloat(peakPct)>30?'above 30% caution threshold':'within normal range'} across ${markets.length} market${markets.length!==1?'s':''}, ${uniqueClients.length} client${uniqueClients.length!==1?'s':''}.`;
+    ins3 = singleClientMkts.length > 0
+      ? `${singleClientMkts.join(', ')}: 100% single-client exposure — redundancy gap in current selection.`
+      : `All ${markets.length} markets show multi-client coverage — low counterparty concentration risk.`;
+    rec1 = `Smooth W${peakPW} load (${peakPct}%) by shifting volume to adjacent weeks before dispatch.`;
+    rec2 = singleClientMkts.length > 0
+      ? `Add a backup buyer in ${singleClientMkts.join(', ')} to reduce single-client dependency.`
+      : `Monitor confirmations per client as the programme advances.`;
+    rec3 = `Complete Status and FOB/TON for all ${uniqueClients.length} clients to unlock confirmation tracking.`;
+  } else {
+    const clientMkts  = [...new Set(rows.map(r=>r.market))].join(', ');
+    const pwCount     = Object.keys(pwMap).length;
+    const sizeMap     = groupBy(rows,'size');
+    const topSize     = topKey(sizeMap);
+    const cSubvs      = [...new Set(rows.map(r=>r.subvariety).filter(Boolean))];
+    const cPackTypes  = [...new Set(rows.map(r=>r.packType).filter(Boolean))];
+    const cPorts      = [...new Set(rows.map(r=>r.port).filter(Boolean))];
+    const varDesc     = cSubvs.length > 0 ? cSubvs.join(', ') : [...new Set(rows.map(r=>r.variety).filter(Boolean))].join(', ');
+    ins1 = `${fmtNum(total)} pallets of ${varDesc}${cPackTypes.length?' ('+cPackTypes.join('/')+')'  :''} to ${clientMkts} — W${Math.min(...rows.map(r=>r.packWeek))}–W${Math.max(...rows.map(r=>r.packWeek))}, ${pwCount} pack week${pwCount!==1?'s':''}.`;
+    ins2 = `W${peakPW} is peak week at ${peakPct}% — confirm packing and ${cPorts.join('/')} slots in advance.`;
+    ins3 = `Size ${topSize} dominates across ${Object.keys(sizeMap).length} size code${Object.keys(sizeMap).length!==1?'s':''} — grading consistency required.`;
+    rec1 = `Lock W${peakPW} packing capacity for ${varDesc} — ${peakPct}% of total allocation.`;
+    rec2 = `Book ${cPorts.join('/')} reefer slots for W${topKey(groupBy(rows,'etaWeek'))} ETA at least 3 weeks ahead.`;
+    rec3 = `Chase order confirmation from ${clientName} for all open PackWeeks.`;
+  }
+
+  insEl.innerHTML = `
+    <div class="grid-3">
+      <div class="insight-card"><span class="num">1.</span>${ins1}</div>
+      <div class="insight-card"><span class="num">2.</span>${ins2}</div>
+      <div class="insight-card"><span class="num">3.</span>${ins3}</div>
+    </div>`;
+  recEl.innerHTML = `
+    <div class="grid-3">
+      <div class="insight-card" style="border-top-color:#854F0B;"><span class="num" style="color:#854F0B;">1.</span>${rec1}</div>
+      <div class="insight-card" style="border-top-color:#854F0B;"><span class="num" style="color:#854F0B;">2.</span>${rec2}</div>
+      <div class="insight-card" style="border-top-color:#006633;"><span class="num" style="color:#006633;">3.</span>${rec3}</div>
+    </div>`;
+}
+
+// ============================================================
+// HEADER DYNAMIC UPDATE
+// ============================================================
+function updateHeader(clientName, mode) {
+  const titleEl = document.getElementById('dynamicHdrTitle');
+  const subEl   = document.getElementById('dynamicHdrSub');
+  const metaEl  = document.getElementById('dynamicHdrMeta');
+  const badgeEl = document.getElementById('dynamicBadge') || document.querySelector('.badge');
+  if (!titleEl) return;
+
+  const rows  = getFiltered(clientName);
+  const total = rows.reduce((s,r)=>s+r.volume,0);
+  const clients= [...new Set(rows.map(r=>r.client))];
+  const mkts  = [...new Set(rows.map(r=>r.market))];
+
+  if (mode==='client' && clientName!=='__ALL__') {
+    titleEl.textContent = `CLIENT PROGRAM DASHBOARD · ${clientName.toUpperCase()} · 2026`;
+    subEl.textContent = `${[...new Set(rows.map(r=>r.variety))].join(', ')} · Season 2026`;
+    metaEl.textContent = `Last Update: 10 Apr 2026 · Market: ${mkts.join(', ')} · Total Volume: ${fmtNum(total)} Pallets`;
+    if (badgeEl) badgeEl.textContent = clientName;
+  } else {
+    titleEl.textContent = 'CLIENT DEMAND PLAN DASHBOARD · ALL VARIETIES · 2026 · W14–W41';
+    subEl.textContent   = 'Varieties: Early Soft, Grapefruit, Late Mandarin, Lemon, Navels, Valencias · Season 2026';
+    metaEl.textContent  = `Last Update: 10 Apr 2026 · Active Clients: ${clients.length} · Markets: ${mkts.join(' · ')} · Total Planned Volume: ${fmtNum(total)} Pallets`;
+    if (badgeEl) badgeEl.textContent = 'W14–W41 · 2026';
+  }
+}
+
+// ============================================================
+// VISIBILITY — INTERNAL vs CLIENT MODE
+// ============================================================
+function applyVisibility(mode, clientName) {
+  const isSpecific = clientName !== '__ALL__';
+  const isClient   = mode === 'client';
+
+  // Internal-only sections: client comparison, global alerts
+  const internalSections = document.querySelectorAll('.internal-only');
+  internalSections.forEach(el => {
+    el.style.display = (isClient && isSpecific) ? 'none' : '';
+  });
+
+  // Client panel
+  const panel = document.getElementById('clientViewPanel');
+  if (panel) panel.style.display = (isClient && isSpecific) ? 'block' : 'none';
+
+  // Mode badges
+  const modeBadge  = document.getElementById('modeBadge');
+  const clientBadge= document.getElementById('clientBadge');
+  if (modeBadge) modeBadge.textContent = isClient ? 'CLIENT' : 'INTERNAL';
+  if (clientBadge) {
+    clientBadge.style.display = isSpecific ? 'inline-block' : 'none';
+    if (isSpecific) clientBadge.textContent = clientName;
+  }
+
+  // Print body class
+  document.body.classList.toggle('client-view', isClient && isSpecific);
+}
+
+// ============================================================
+// MAIN APPLY FILTER
+// ============================================================
+function applyFilter() {
+  currentClient     = document.getElementById('clientSelect').value;
+  const svEl        = document.getElementById('subvarietySelect');
+  const szEl        = document.getElementById('sizeSelect');
+  currentSubvariety = svEl ? svEl.value : '__ALL__';
+  currentSize       = szEl ? szEl.value : '__ALL__';
+
+  const rows  = getFilteredAll();
+  const total = rows.reduce((s,r)=>s+r.volume,0);
+  const isAll = currentClient==='__ALL__';
+  const isClientMode = currentMode==='client';
+
+  updateHeaderSlim(rows, currentClient, currentMode);
+  applyVisibility(currentMode, currentClient);
+  renderKPIs3(rows, total, isAll);
+  renderWeeklyChartsEnhanced(rows, total);
+  renderClientTableEnhanced(rows, total);
+  renderMarketFocus(rows, total);
+  renderSizeMixConditional(rows, total, isAll);
+  renderClassSizeSection(rows, total);
+  renderCommercialFocus(rows, total);
+  renderAlerts(rows, total, isAll);
+  renderInsights(rows, total, isAll ? null : currentClient);
+
+  renderAllClientsMatrixEnhanced(rows, total);
+
+  if (isClientMode && !isAll) {
+    renderClientView(rows, total, currentClient);
+  } else {
+    const panel = document.getElementById('clientViewPanel');
+    if (panel) panel.style.display = 'none';
+  }
+}
+
+function setViewMode(mode) {
+  currentMode = mode;
+  document.getElementById('btnInternal').classList.toggle('active', mode==='internal');
+  document.getElementById('btnClient').classList.toggle('active', mode==='client');
+  applyFilter();
+}
+
+// ============================================================
+// STATE — subvariety + size filters
+// ============================================================
+let currentSubvariety = '__ALL__';
+let currentSize       = '__ALL__';
+
+// ============================================================
+// POPULATE FILTER DROPDOWNS from data
+// ============================================================
+function populateFilterDropdowns() {
+  // ── Client selector (built dynamically from live data) ──
+  const clientSel = document.getElementById('clientSelect');
+  if (clientSel) {
+    const prev = clientSel.value;
+    const clients = [...new Set(RAW_DATA.map(r => r.client).filter(c => c))].sort();
+    clientSel.innerHTML = '<option value="__ALL__">All Clients</option>' +
+      clients.map(c => `<option value="${c}"${c===prev?' selected':''}>${c}</option>`).join('');
+  }
+  // ── Subvariety selector ──
+  const subvSel = document.getElementById('subvarietySelect');
+  if (subvSel) {
+    const subvs = [...new Set(RAW_DATA.map(r => r.subvariety).filter(s => s && s !== ''))].sort();
+    subvSel.innerHTML = '<option value="__ALL__">All Subvarieties</option>' +
+      subvs.map(s => `<option value="${s}">${s}</option>`).join('');
+  }
+  // ── Size selector ──
+  const sizeSel = document.getElementById('sizeSelect');
+  if (sizeSel) {
+    const sizes = [...new Set(RAW_DATA.map(r => r.size).filter(s => s && s !== ''))].sort();
+    sizeSel.innerHTML = '<option value="__ALL__">All Sizes</option>' +
+      sizes.map(s => `<option value="${s}">${s}</option>`).join('');
+  }
+}
+
+// ============================================================
+// UPDATED getFiltered — respects subvariety + size
+// ============================================================
+function getFilteredAll() {
+  let rows = RAW_DATA;
+  if (currentClient     !== '__ALL__') rows = rows.filter(r => r.client === currentClient);
+  if (currentSubvariety !== '__ALL__') rows = rows.filter(r => r.subvariety === currentSubvariety);
+  if (currentSize       !== '__ALL__') rows = rows.filter(r => r.size === currentSize);
+  return rows;
+}
+
+// ============================================================
+// COMMERCIAL FOCUS
+// ============================================================
+function renderCommercialFocus(rows, total) {
+  const container = document.getElementById('cfBullets');
+  const weekEl    = document.getElementById('cfWeek');
+  if (!container) return;
+
+  const pwMap  = groupBy(rows, 'packWeek');
+  const peakPW = +topKey(pwMap);
+  if (weekEl) weekEl.textContent = `W${peakPW}`;
+
+  const mktMap        = groupBy(rows, 'market');
+  const topMkt        = topKey(mktMap);
+  const topMktPct     = total ? (mktMap[topMkt]/total*100).toFixed(0) : 0;
+  const cvMap         = groupBy(rows, 'client');
+  const topClient     = sortedEntries(cvMap)[0];
+  const topClientPct  = topClient && total ? (topClient[1]/total*100).toFixed(0) : 0;
+  const peakPct       = total ? (pwMap[peakPW]/total*100).toFixed(0) : 0;
+
+  const statusMap = {};
+  rows.forEach(r => { if(r.status) statusMap[r.status]=(statusMap[r.status]||0)+r.volume; });
+  const confirmed  = statusMap['Confirmed'] || 0;
+  const confirmedPct = total ? (confirmed/total*100).toFixed(0) : 0;
+  const unconfirmed  = (statusMap['No_Confirmed']||0) + (statusMap['Medium']||0);
+  const unconfPct    = total ? (unconfirmed/total*100).toFixed(0) : 0;
+
+  const fobRows = rows.filter(r => r.fob > 0);
+  const avgFOB  = fobRows.length ? Math.round(fobRows.reduce((s,r)=>s+r.fob,0)/fobRows.length) : 0;
+
+  const subvMap = groupBy(rows, 'subvariety');
+  const topSubv = topKey(subvMap);
+
+  let riskText, oppText, insightText;
+
+  if (unconfirmed > 0) {
+    riskText = `${fmtNum(unconfirmed)} pallets (${unconfPct}%) unconfirmed — W${peakPW} peak (${peakPct}%) amplifies exposure if confirmation is delayed.`;
+  } else if (parseFloat(peakPct) > 25) {
+    riskText = `W${peakPW} carries ${peakPct}% of volume — above safe threshold. Review packing and logistics capacity.`;
+  } else {
+    riskText = `Volume spread is stable. Monitor W${peakPW} as peak week. No immediate concentration risk detected.`;
+  }
+
+  if (confirmed > 0) {
+    oppText = `${fmtNum(confirmed)} pallets (${confirmedPct}%) confirmed — strong revenue base.${parseFloat(topClientPct) >= 20 ? ` ${topClient[0].split(' ').slice(0,2).join(' ')} anchors ${topClientPct}% of demand.` : ''}`;
+  } else {
+    oppText = `${topMkt} leads at ${topMktPct}%. Prioritise confirmation with ${topClient ? topClient[0].split(' ').slice(0,2).join(' ') : '—'} (${topClientPct}%) to lock revenue.`;
+  }
+
+  if (avgFOB > 0) {
+    const topMkts = sortedEntries(mktMap).slice(0,2).map(([m])=>m).join(' and ');
+    insightText = `Avg FOB/TON across selection: USD ${fmtNum(avgFOB)}.${topSubv ? ` ${topSubv} is the dominant subvariety by volume.` : ''} ${topMkts} lead${topMkts.includes(' and ')?'':' as'} primary destination${topMkts.includes(' and ')?'s':''} — monitor FX and tariff conditions.`;
+  } else {
+    const topMkts = sortedEntries(mktMap).slice(0,2).map(([m])=>m).join(' and ');
+    insightText = `${topMkt} represents the primary market (${topMktPct}%).${topSubv ? ` ${topSubv} dominates the subvariety mix.` : ''} Programme runs W${Math.min(...rows.map(r=>r.packWeek))}–W${Math.max(...rows.map(r=>r.packWeek))}.`;
+  }
+
+  container.innerHTML = `
+    <div class="cf-bullet">
+      <div class="cf-tag risk">⚠ Main Risk</div>${riskText}
+    </div>
+    <div class="cf-bullet">
+      <div class="cf-tag opportunity">✅ Opportunity</div>${oppText}
+    </div>
+    <div class="cf-bullet">
+      <div class="cf-tag insight">💡 Market Insight</div>${insightText}
+    </div>`;
+}
+
+// ============================================================
+// WEEKLY IMBALANCE helpers
+// ============================================================
+let weekStats = { avg: 0, stdDev: 0 };
+
+function computeWeekStats(rows) {
+  const pwMap = groupBy(rows, 'packWeek');
+  const vals  = Object.values(pwMap);
+  if (!vals.length) return;
+  const avg     = vals.reduce((s,v)=>s+v,0) / vals.length;
+  const variance= vals.reduce((s,v)=>s+(v-avg)**2,0) / vals.length;
+  weekStats = { avg, stdDev: Math.sqrt(variance) };
+}
+
+// ============================================================
+// CLIENT RISK TAGS
+// ============================================================
+function getClientRiskTag(client, rows, total) {
+  const cr = rows.filter(r => r.client === client);
+  if (!cr.length) return '';
+  const vol       = cr.reduce((s,r)=>s+r.volume,0);
+  const confirmed = cr.filter(r=>r.status==='Confirmed').reduce((s,r)=>s+r.volume,0);
+  const high      = cr.filter(r=>r.status==='High').reduce((s,r)=>s+r.volume,0);
+  const confPct   = vol ? confirmed/vol : 0;
+  const highPct   = vol ? high/vol : 0;
+  const share     = total ? vol/total : 0;
+  if (confPct < 0.3 && share >= 0.05 && (confirmed+high)/vol < 0.5)
+    return '<span class="risk-tag risk-at-risk">⚠ At Risk</span>';
+  if ((confPct + highPct) >= 0.7 && share >= 0.05)
+    return '<span class="risk-tag risk-opportunity">★ Opportunity</span>';
+  return '<span class="risk-tag risk-on-track">✓ On Track</span>';
+}
+
+// ============================================================
+// renderClientTableEnhanced — risk tag as last column, no sizes col
+// ============================================================
+function renderClientTableEnhanced(rows, total) {
+  const tbody = document.querySelector('#clientBreakdownTable tbody');
+  if (!tbody) return;
+  tbody.innerHTML = '';
+  const clientMap = {};
+  rows.forEach(r => {
+    if (!clientMap[r.client]) clientMap[r.client] = {vol:0,markets:new Set()};
+    clientMap[r.client].vol += r.volume;
+    clientMap[r.client].markets.add(r.market);
+  });
+  Object.entries(clientMap).sort((a,b)=>b[1].vol-a[1].vol).forEach(([client, d]) => {
+    const share    = total ? (d.vol/total*100).toFixed(1) : 0;
+    const mktArr   = [...d.markets].join('/');
+    const barColor = parseFloat(share)>=40?'red':parseFloat(share)>=30?'amber':'';
+    const riskTag  = getClientRiskTag(client, rows, total);
+    tbody.innerHTML += `<tr>
+      <td><strong>${client}</strong></td>
+      <td>${mktArr}</td>
+      <td>${fmtNum(d.vol)}</td>
+      <td>${share}%</td>
+      <td><div class="prog-bar-wrap"><div class="prog-bar ${barColor}" style="width:${Math.min(share,100)}%"></div></div></td>
+      <td>${riskTag}</td></tr>`;
+  });
+  tbody.innerHTML += `<tr style="background:#E8F5EE;">
+    <td><strong>TOTAL</strong></td>
+    <td>${[...new Set(rows.map(r=>r.market))].join('/')}</td>
+    <td><strong>${fmtNum(total)}</strong></td>
+    <td><strong>100%</strong></td>
+    <td><div class="prog-bar-wrap"><div class="prog-bar" style="width:100%"></div></div></td>
+    <td></td></tr>`;
+}
+
+// ============================================================
+// renderWeeklyChartsEnhanced — colour by load level
+// ============================================================
+function renderWeeklyChartsEnhanced(rows, total) {
+  computeWeekStats(rows);
+  const { avg, stdDev } = weekStats;
+  const pwMap  = groupBy(rows,'packWeek');
+  const pwKeys = Object.keys(pwMap).map(Number).sort((a,b)=>a-b);
+  const pwVals = pwKeys.map(k=>pwMap[k]);
+  const maxPW  = Math.max(...pwVals);
+  const pwColors = pwVals.map(v => {
+    if (v > avg + stdDev*0.8) return '#E8A000';
+    if (v < avg - stdDev*0.6 && v > 0) return '#94C9A9';
+    return v === maxPW ? C.YELLOW : C.GREEN;
+  });
+  upsertBarChart('chartPackWeek', pwKeys.map(w=>'W'+w), pwVals, pwColors, total);
+  const etaMap  = groupBy(rows,'etaWeek');
+  const etaKeys = Object.keys(etaMap).map(Number).sort((a,b)=>a-b);
+  const etaVals = etaKeys.map(k=>etaMap[k]);
+  const maxETA  = Math.max(...etaVals);
+  upsertBarChart('chartETAWeek', etaKeys.map(w=>'W'+w), etaVals,
+    etaVals.map(v=>v===maxETA?C.YELLOW:C.LG), total);
+}
+
+// ============================================================
+// renderAllClientsMatrixEnhanced — load tags + risk tags
+// ============================================================
+function renderAllClientsMatrixEnhanced(rows, total) {
+  const container = document.getElementById('allClientsMatrix');
+  const tbl       = document.getElementById('acmTable');
+  const sub       = document.getElementById('acmSubtitle');
+  if (!container || !tbl) return;
+  if (currentClient !== '__ALL__' || currentMode === 'client') {
+    container.style.display = 'none'; return;
+  }
+  container.style.display = 'block';
+  computeWeekStats(rows);
+
+  const clientVols = {}, clientMkts = {};
+  rows.forEach(r => {
+    clientVols[r.client] = (clientVols[r.client]||0) + r.volume;
+    if (!clientMkts[r.client]) clientMkts[r.client] = new Set();
+    clientMkts[r.client].add(r.market);
+  });
+  const sortedClients = Object.entries(clientVols).sort((a,b)=>b[1]-a[1]).map(([c])=>c);
+  const etaMap    = groupBy(rows, 'etaWeek');
+  const allWeeks  = Object.keys(etaMap).map(Number).sort((a,b)=>a-b);
+  const matrix    = {};
+  rows.forEach(r => {
+    if (!matrix[r.client]) matrix[r.client] = {};
+    matrix[r.client][r.etaWeek] = (matrix[r.client][r.etaWeek]||0) + r.volume;
+  });
+  const colTotals = {};
+  allWeeks.forEach(w => { colTotals[w] = sortedClients.reduce((s,c)=>s+(matrix[c]?.[w]||0),0); });
+  const grandTotal = allWeeks.reduce((s,w)=>s+(colTotals[w]||0),0);
+  const peakWeek   = allWeeks.reduce((best,w)=>(colTotals[w]||0)>(colTotals[best]||0)?w:best,allWeeks[0]);
+  const colVals    = allWeeks.map(w=>colTotals[w]||0).filter(v=>v>0);
+  const colAvg     = colVals.reduce((s,v)=>s+v,0)/colVals.length;
+  const colStd     = Math.sqrt(colVals.reduce((s,v)=>s+(v-colAvg)**2,0)/colVals.length);
+
+  if (sub) sub.textContent = `${sortedClients.length} clients · ${fmtNum(grandTotal)} pallets`;
+
+  let html = '<thead><tr><th class="cpt-row-hdr">Client</th><th style="text-align:left;min-width:45px;">Market</th>';
+  allWeeks.forEach(w => {
+    const wVol = colTotals[w]||0;
+    let loadTag = '';
+    if (wVol > colAvg + colStd*0.8) loadTag = '<span class="wk-tag wk-high">H</span>';
+    else if (wVol < colAvg - colStd*0.6 && wVol > 0) loadTag = '<span class="wk-tag wk-low">L</span>';
+    html += `<th class="${w===peakWeek?'cpt-peak-hdr':''}">W${w}${loadTag}</th>`;
+  });
+  html += '<th class="cpt-total-hdr">Total</th></tr></thead><tbody>';
+
+  sortedClients.forEach(client => {
+    const mkts    = [...clientMkts[client]].join('/');
+    const riskTag = getClientRiskTag(client, rows, total);
+    html += `<tr><td class="cpt-row-hdr">${client}</td><td style="font-size:7px;color:#558866;">${mkts}</td>`;
+    allWeeks.forEach(w => {
+      const val  = matrix[client]?.[w] || 0;
+      const isPeak = (w===peakWeek) && val>0;
+      html += `<td class="${val===0?'cpt-empty':isPeak?'cpt-peak':'cpt-active'}">${val===0?'—':fmtNum(val)}</td>`;
+    });
+    html += `<td class="cpt-total-col">${fmtNum(clientVols[client])}</td></tr>`;
+  });
+  html += '<tr class="cpt-total-row"><td class="cpt-row-hdr">TOTAL</td><td></td>';
+  allWeeks.forEach(w => {
+    html += `<td class="${w===peakWeek?'cpt-total-col':''}">${fmtNum(colTotals[w]||0)}</td>`;
+  });
+  html += `<td class="cpt-total-col">${fmtNum(grandTotal)}</td></tr></tbody>`;
+  tbl.innerHTML = html;
+}
+
+// ============================================================
+// renderSizeMixConditional — only show for specific client
+// ============================================================
+function renderSizeMixConditional(rows, total, isAll) {
+  const section = document.getElementById('sizeMixSection');
+  if (!section) return;
+  section.style.display = isAll ? 'none' : 'block';
+  if (!isAll) renderSizeMix(rows, total);
+}
+
+// ============================================================
+// renderKPIs3 — 3 KPI cards only
+// ============================================================
+function renderKPIs3(rows, total, isAll) {
+  const el = document.querySelector('.kpi-row');
+  if (!el) return;
+  const pwMap    = groupBy(rows, 'packWeek');
+  const peakPW   = +topKey(pwMap);
+  const peakPct  = total ? ((pwMap[peakPW]||0)/total*100).toFixed(1) : 0;
+  const peakAmber = parseFloat(peakPct) > 25;
+  const cvMap    = groupBy(rows, 'client');
+  const topClient = sortedEntries(cvMap)[0];
+  const packWeeks = rows.map(r=>r.packWeek);
+  const minPW = packWeeks.length ? Math.min(...packWeeks) : 14;
+  const maxPW = packWeeks.length ? Math.max(...packWeeks) : 41;
+  el.innerHTML = `
+    <div class="kpi">
+      <div class="kpi-label">Total Volume (Pallets)</div>
+      <div class="kpi-val">${fmtNum(total)}</div>
+      <div class="kpi-sub">${isAll?'All clients':topClient?topClient[0].split(' ')[0]:'—'} · W${minPW}–W${maxPW}</div>
+    </div>
+    <div class="kpi ${peakAmber?'amber':''}">
+      <div class="kpi-label">Peak Pack Week</div>
+      <div class="kpi-val">W${peakPW}</div>
+      <div class="kpi-sub ${peakAmber?'am':''}"><strong>${peakPct}%</strong> of volume</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">Top Client</div>
+      <div class="kpi-val" style="font-size:9px;margin-top:3px;line-height:1.2;">${topClient?topClient[0].split(' ').slice(0,3).join(' '):'—'}</div>
+      <div class="kpi-sub">${topClient?fmtNum(topClient[1]):0} pal · ${topClient?(topClient[1]/total*100).toFixed(1):0}%</div>
+    </div>`;
+}
+
+// ============================================================
+// updateHeaderSlim — Week range · Total · Clients
+// ============================================================
+function updateHeaderSlim(rows, clientName, mode) {
+  const titleEl = document.getElementById('dynamicHdrTitle');
+  const badgeEl = document.getElementById('dynamicBadge') || document.querySelector('.badge');
+  if (!titleEl) return;
+  const clients   = [...new Set(rows.map(r=>r.client))];
+  const packWeeks = rows.map(r=>r.packWeek);
+  const minPW = packWeeks.length ? Math.min(...packWeeks) : 14;
+  const maxPW = packWeeks.length ? Math.max(...packWeeks) : 41;
+  const total = rows.reduce((s,r)=>s+r.volume,0);
+  if (mode==='client' && clientName!=='__ALL__') {
+    titleEl.textContent = `${clientName} · W${minPW}–W${maxPW} · ${fmtNum(total)} Pallets`;
+    if (badgeEl) badgeEl.textContent = clientName.split(' ')[0];
+  } else {
+    titleEl.textContent = `CLIENT DEMAND PLAN · W${minPW}–W${maxPW} · ${fmtNum(total)} Pallets · ${clients.length} Clients`;
+    if (badgeEl) badgeEl.textContent = `W${minPW}–W${maxPW} · 2026`;
+  }
+}
+
+// ============================================================
+// INIT — fire after all static charts from old code are created
+// ============================================================
+function initDynamic() {
+  populateFilterDropdowns();
+  // Hand charts over to dynamic system after they were first created statically
+  const existing = Chart.instances;
+  Object.values(existing).forEach(c => {
+    if (c.canvas && c.canvas.id) charts[c.canvas.id] = c;
+  });
+  // Trigger first pass to wire up dynamic rendering without rebuilding statics
+  applyFilter();
+}
+</script>
+
+<script>
+const GREEN = '#006633';
+const LIGHT_GREEN = '#94C9A9';
+const YELLOW = '#FFD100';
+const RED = '#CC0000';
+const AMBER = '#854F0B';
+const DCEFE4 = '#DCEFE4';
+const defaults = {
+  responsive: true,
+  maintainAspectRatio: false,
+  animation: { duration: 0 },
+  plugins: {
+    legend: {
+      display: false
+    }
+  }
+};
+
+// --- PACKWEEK CHART ---
+const ctxPW = document.getElementById('chartPackWeek').getContext('2d');
+const packWeeks = [19, 20, 21, 22, 23];
+const packVols = [160, 220, 500, 200, 80];
+const peakWk = 21;
+new Chart(ctxPW, {
+  type: 'bar',
+  data: {
+    labels: packWeeks.map(w => 'W' + w),
+    datasets: [{
+      label: 'Volume (Pallets)',
+      data: packVols,
+      backgroundColor: packWeeks.map(w => w === peakWk ? YELLOW : GREEN),
+      borderRadius: 2
+    }]
+  },
+  options: {
+    ...defaults,
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        callbacks: {
+          label: ctx => ` ${ctx.parsed.y} pallets (${(ctx.parsed.y/1160*100).toFixed(1)}%)`
+        }
+      }
+    },
+    scales: {
+      x: {
+        ticks: { font: { size: 8 } },
+        grid: { display: false }
+      },
+      y: {
+        ticks: { font: { size: 7 } },
+        grid: { color: '#f0f0f0' },
+        title: { display: true, text: 'Pallets', font: { size: 7 } }
+      }
+    }
+  }
+});
+
+// --- ETA WEEK CHART ---
+const ctxETA = document.getElementById('chartETAWeek').getContext('2d');
+const etaWeeks = [24, 25, 26, 27, 28];
+const etaVols = [160, 220, 500, 200, 80];
+new Chart(ctxETA, {
+  type: 'bar',
+  data: {
+    labels: etaWeeks.map(w => 'W' + w),
+    datasets: [{
+      label: 'Volume (Pallets)',
+      data: etaVols,
+      backgroundColor: etaWeeks.map((w, i) => etaVols[i] === Math.max(...etaVols) ? YELLOW : LIGHT_GREEN),
+      borderRadius: 2
+    }]
+  },
+  options: {
+    ...defaults,
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        callbacks: {
+          label: ctx => ` ${ctx.parsed.y} pallets (${(ctx.parsed.y/1160*100).toFixed(1)}%)`
+        }
+      }
+    },
+    scales: {
+      x: {
+        ticks: { font: { size: 8 } },
+        grid: { display: false }
+      },
+      y: {
+        ticks: { font: { size: 7 } },
+        grid: { color: '#f0f0f0' },
+        title: { display: true, text: 'Pallets', font: { size: 7 } }
+      }
+    }
+  }
+});
+
+// --- SIZE MIX DOUGHNUT ---
+const ctxSZ = document.getElementById('chartSizeMix').getContext('2d');
+new Chart(ctxSZ, {
+  type: 'doughnut',
+  data: {
+    labels: ['2', '3', '1', '4', '1xx', '1xxx', '1x'],
+    datasets: [{
+      data: [448, 370, 176, 86, 40, 24, 16],
+      backgroundColor: [GREEN, LIGHT_GREEN, YELLOW, DCEFE4, AMBER, '#C0D8C8', '#E8F5EE'],
+      borderWidth: 1,
+      borderColor: 'white'
+    }]
+  },
+  options: {
+    ...defaults,
+    cutout: '62%',
+    plugins: {
+      legend: {
+        display: true,
+        position: 'right',
+        labels: {
+          font: { size: 7 },
+          boxWidth: 10,
+          padding: 4,
+          generateLabels: chart => {
+            const data = chart.data;
+            return data.labels.map((label, i) => {
+              const val = data.datasets[0].data[i];
+              const pct = (val/1160*100).toFixed(1);
+              return {
+                text: `${label}: ${val} (${pct}%)`,
+                fillStyle: data.datasets[0].backgroundColor[i],
+                strokeStyle: 'white',
+                lineWidth: 1,
+                index: i
+              };
+            });
+          }
+        }
+      },
+      tooltip: {
+        callbacks: {
+          label: ctx => ` Size ${ctx.label}: ${ctx.parsed} pallets (${(ctx.parsed/1160*100).toFixed(1)}%)`
+        }
+      }
+    }
+  }
+});
+
+// ─── Boot: load live data from Google Sheets, then init ───
+window.addEventListener("load", loadFromSheet);
+</script>
+</body>
+</html>
