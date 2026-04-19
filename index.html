@@ -563,15 +563,6 @@ tr:nth-child(even) td { background: #F4FBF7; }
     <option value="__ALL__">All Sizes</option>
   </select>
   <div class="filter-divider"></div>
-  <label>🌍 Market</label>
-  <select class="filter-select-sm" id="marketSelect" onchange="applyFilter()">
-    <option value="__ALL__">All Markets</option>
-  </select>
-  <label>🍊 Variety</label>
-  <select class="filter-select-sm" id="varietySelect" onchange="applyFilter()">
-    <option value="__ALL__">All Varieties</option>
-  </select>
-  <div class="filter-divider"></div>
   <span class="mode-badge" id="modeBadge">INTERNAL</span>
   <span class="client-badge" id="clientBadge" style="display:none;"></span>
 </div>
@@ -2014,11 +2005,7 @@ function getFilteredAll() {
   if (currentClient     !== '__ALL__') rows = rows.filter(r => r.client === currentClient);
   if (currentSubvariety !== '__ALL__') rows = rows.filter(r => r.subvariety === currentSubvariety);
   if (currentSize       !== '__ALL__') rows = rows.filter(r => r.size === currentSize);
-  // Filtros adicionales (market y variety) si existen los selectores
-  const mktSel = document.getElementById('marketSelect');
-  const varSel = document.getElementById('varietySelect');
-  if (mktSel && mktSel.value !== '__ALL__') rows = rows.filter(r => r.market === mktSel.value);
-  if (varSel && varSel.value !== '__ALL__') rows = rows.filter(r => r.variety === varSel.value);
+
   return rows;
 }
 
