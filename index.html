@@ -1953,12 +1953,22 @@ let currentSize       = '__ALL__';
 // POPULATE FILTER DROPDOWNS from data
 // ============================================================
 function populateFilterDropdowns() {
+  // ── Client selector ──
+  const clientSel = document.getElementById('clientSelect');
+  if (clientSel) {
+    const prev = clientSel.value;
+    const clients = [...new Set(RAW_DATA.map(r => r.client).filter(c => c))].sort();
+    clientSel.innerHTML = '<option value="__ALL__">All Clients</option>' +
+      clients.map(c => `<option value="${c}"${c===prev?' selected':''}>${c}</option>`).join('');
+  }
+  // ── Subvariety selector ──
   const subvSel = document.getElementById('subvarietySelect');
   if (subvSel) {
     const subvs = [...new Set(RAW_DATA.map(r => r.subvariety).filter(s => s && s !== ''))].sort();
     subvSel.innerHTML = '<option value="__ALL__">All Subvarieties</option>' +
       subvs.map(s => `<option value="${s}">${s}</option>`).join('');
   }
+  // ── Size selector ──
   const sizeSel = document.getElementById('sizeSelect');
   if (sizeSel) {
     const sizes = [...new Set(RAW_DATA.map(r => r.size).filter(s => s && s !== ''))].sort();
