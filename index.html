@@ -471,6 +471,40 @@ tr:nth-child(even) td { background: #F4FBF7; }
 }
 .filter-select-sm option { background: #004D26; }
 .filter-select-sm:focus { outline: none; border-color: #FFD100; }
+
+/* ===== TOGGLE SECCIONES ===== */
+.section-toggle-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 5px;
+}
+.section-toggle-bar .sec-title { margin-bottom: 0; }
+.btn-toggle-section {
+  background: transparent;
+  border: 1px solid #C0D8C8;
+  color: #558866;
+  font-size: 7px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 8px;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  white-space: nowrap;
+  transition: background 0.15s;
+}
+.btn-toggle-section:hover { background: #E8F5EE; }
+.btn-toggle-section.hidden-state { color: #006633; border-color: #006633; background: #E8F5EE; }
+/* Banner carga */
+#_ldbanner {
+  position: fixed; top: 0; left: 0; width: 100%; z-index: 9999;
+  padding: 8px 16px; font-family: Arial,sans-serif; font-size: 11px;
+  font-weight: 700; text-align: center; transition: opacity 0.5s;
+}
+/* Footer dinámico */
+#footerOutlook { line-height: 1.6; }
+
 </style>
 </head>
 <body>
@@ -527,6 +561,15 @@ tr:nth-child(even) td { background: #F4FBF7; }
   <label>📐 Size</label>
   <select class="filter-select-sm" id="sizeSelect" onchange="applyFilter()">
     <option value="__ALL__">All Sizes</option>
+  </select>
+  <div class="filter-divider"></div>
+  <label>🌍 Market</label>
+  <select class="filter-select-sm" id="marketSelect" onchange="applyFilter()">
+    <option value="__ALL__">All Markets</option>
+  </select>
+  <label>🍊 Variety</label>
+  <select class="filter-select-sm" id="varietySelect" onchange="applyFilter()">
+    <option value="__ALL__">All Varieties</option>
   </select>
   <div class="filter-divider"></div>
   <span class="mode-badge" id="modeBadge">INTERNAL</span>
@@ -596,9 +639,15 @@ tr:nth-child(even) td { background: #F4FBF7; }
 
 <!-- ==================== COMMERCIAL FOCUS ==================== -->
 <div id="commercialFocus">
-  <div class="cf-wrap">
-    <div class="cf-title" id="cfTitle">COMMERCIAL FOCUS – WEEK <span id="cfWeek">—</span></div>
-    <div class="cf-bullets" id="cfBullets"><!-- filled by JS --></div>
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:3px;">
+    <span style="font-size:8px;font-weight:700;color:#006633;text-transform:uppercase;letter-spacing:0.4px;">Commercial Focus</span>
+    <button class="btn-toggle-section" onclick="toggleSection('cfBody',this)">Ocultar</button>
+  </div>
+  <div id="cfBody">
+    <div class="cf-wrap">
+      <div class="cf-title" id="cfTitle">COMMERCIAL FOCUS – WEEK <span id="cfWeek">—</span></div>
+      <div class="cf-bullets" id="cfBullets"><!-- filled by JS --></div>
+    </div>
   </div>
 </div>
 
@@ -795,7 +844,10 @@ tr:nth-child(even) td { background: #F4FBF7; }
 
 <!-- ==================== RISK & ALERTS ==================== -->
 <div style="margin-top:8px;">
-  <div class="sec-title internal-only">⚠ Risk &amp; Alerts — Automated Analysis</div>
+  <div class="section-toggle-bar internal-only">
+    <div class="sec-title" style="margin-bottom:0;">⚠ Risk &amp; Alerts — Automated Analysis</div>
+    <button class="btn-toggle-section" onclick="toggleSection('alertsContainer',this)">Ocultar</button>
+  </div>
   <div id="alertsContainer" class="internal-only">
   <!-- Dynamic alerts rendered by JS -->
 </div>
@@ -803,14 +855,20 @@ tr:nth-child(even) td { background: #F4FBF7; }
 
 <!-- ==================== COMMERCIAL INSIGHTS ==================== -->
 <div style="margin-top:8px;">
-  <div class="sec-title">💡 Commercial Insights</div>
+  <div class="section-toggle-bar">
+    <div class="sec-title" style="margin-bottom:0;">💡 Commercial Insights</div>
+    <button class="btn-toggle-section" onclick="toggleSection('insightsContainer',this)">Ocultar</button>
+  </div>
   <div id="insightsContainer">
   <!-- Dynamic insights rendered by JS -->
 </div>
 
 <!-- ==================== RECOMMENDATIONS ==================== -->
 <div style="margin-top:4px;">
-  <div class="sec-title">🎯 Recommendations</div>
+  <div class="section-toggle-bar">
+    <div class="sec-title" style="margin-bottom:0;">🎯 Recommendations</div>
+    <button class="btn-toggle-section" onclick="toggleSection('recsContainer',this)">Ocultar</button>
+  </div>
   <div id="recsContainer">
   <!-- Dynamic recs rendered by JS -->
 </div>
@@ -819,9 +877,8 @@ tr:nth-child(even) td { background: #F4FBF7; }
 <div class="footer">
   <div>
     <div class="footer-label">COMMERCIAL OUTLOOK</div>
-    <div class="footer-left">
-      Client Demand Plan 2026: W14–W41 · Total 17,879 pallets · 6 markets · 30 clients · Early Soft, Grapefruit, Late Mandarin, Lemon, Navels, Valencias.<br>
-      China leads (40%). W30 peak (8%). FOB/TON data available. Status tracking active.
+    <div class="footer-left" id="footerOutlook">
+      Cargando datos…
     </div>
   </div>
   <div class="footer-right">
@@ -860,6 +917,9 @@ function _showLoadBanner(msg, isError) {
 
 function _mapRow(row) {
   const fobRaw = String(row['FOB/TON'] || row.FOB || row.fob || '0').replace(/[^0-9,.-]/g,'').replace(',','.');
+  const sizeVal = (row['Size Profile'] !== undefined && String(row['Size Profile']).trim() !== '')
+    ? String(row['Size Profile']).trim()
+    : String(row.Size || row.size || '').trim();
   return {
     client:     String(row.Client     || row.client     || '').trim(),
     market:     String(row.Market     || row.market     || '').trim(),
@@ -869,11 +929,13 @@ function _mapRow(row) {
     port:       String(row.Port       || row.port       || '').trim(),
     packWeek:   parseInt(row.PackWeek || row.packWeek   || 0) || 0,
     etaWeek:    parseInt(row.ETAWeek  || row.etaWeek    || 0) || 0,
-    size:       String(row['Size Profile'] !== undefined && row['Size Profile'] !== '' ? row['Size Profile'] : (row.Size || row.size || '')).trim(),
+    size:       sizeVal,
     classCode:  String(row.Class      || row.classCode  || '').trim(),
     volume:     parseFloat(row.Volume || row.volume     || 0) || 0,
     status:     String(row.Status     || row.status     || '').trim(),
     fob:        parseFloat(fobRaw) || 0,
+    riskFlag:   String(row.Risk_Flag  || row.riskFlag   || '').trim(),
+    lastUpdate: String(row['Last Update'] || '').trim(),
   };
 }
 
@@ -887,6 +949,7 @@ async function loadFromSheet() {
     RAW_DATA = json.map(_mapRow).filter(r => r.client && r.volume > 0);
     if (RAW_DATA.length === 0) throw new Error('0 filas válidas');
     _showLoadBanner('✓ ' + RAW_DATA.length + ' filas cargadas desde Google Sheets', false);
+    _updateFooter();
     // Auto-refresh cada 5 minutos en segundo plano
     setInterval(async () => {
       try {
@@ -1830,12 +1893,16 @@ function updateHeader(clientName, mode) {
   if (mode==='client' && clientName!=='__ALL__') {
     titleEl.textContent = `CLIENT PROGRAM DASHBOARD · ${clientName.toUpperCase()} · 2026`;
     subEl.textContent = `${[...new Set(rows.map(r=>r.variety))].join(', ')} · Season 2026`;
-    metaEl.textContent = `Last Update: 10 Apr 2026 · Market: ${mkts.join(', ')} · Total Volume: ${fmtNum(total)} Pallets`;
+    const lastUpdRaw = RAW_DATA.find(r => r.lastUpdate)?.lastUpdate || '';
+    const lastUpdStr = lastUpdRaw ? new Date(lastUpdRaw).toLocaleDateString('es-ES',{day:'2-digit',month:'short',year:'numeric'}) : '10 Apr 2026';
+    metaEl.textContent = `Last Update: ${lastUpdStr} · Market: ${mkts.join(', ')} · Total Volume: ${fmtNum(total)} Pallets`;
     if (badgeEl) badgeEl.textContent = clientName;
   } else {
     titleEl.textContent = 'CLIENT DEMAND PLAN DASHBOARD · ALL VARIETIES · 2026 · W14–W41';
     subEl.textContent   = 'Varieties: Early Soft, Grapefruit, Late Mandarin, Lemon, Navels, Valencias · Season 2026';
-    metaEl.textContent  = `Last Update: 10 Apr 2026 · Active Clients: ${clients.length} · Markets: ${mkts.join(' · ')} · Total Planned Volume: ${fmtNum(total)} Pallets`;
+    const lastUpdRaw2 = RAW_DATA.find(r => r.lastUpdate)?.lastUpdate || '';
+    const lastUpdStr2 = lastUpdRaw2 ? new Date(lastUpdRaw2).toLocaleDateString('es-ES',{day:'2-digit',month:'short',year:'numeric'}) : '10 Apr 2026';
+    metaEl.textContent  = `Last Update: ${lastUpdStr2} · Active Clients: ${clients.length} · Markets: ${mkts.join(' · ')} · Total Planned Volume: ${fmtNum(total)} Pallets`;
     if (badgeEl) badgeEl.textContent = 'W14–W41 · 2026';
   }
 }
@@ -1879,6 +1946,7 @@ function applyFilter() {
   const szEl        = document.getElementById('sizeSelect');
   currentSubvariety = svEl ? svEl.value : '__ALL__';
   currentSize       = szEl ? szEl.value : '__ALL__';
+  // market y variety se leen directamente en getFilteredAll()
 
   const rows  = getFilteredAll();
   const total = rows.reduce((s,r)=>s+r.volume,0);
@@ -1946,6 +2014,11 @@ function getFilteredAll() {
   if (currentClient     !== '__ALL__') rows = rows.filter(r => r.client === currentClient);
   if (currentSubvariety !== '__ALL__') rows = rows.filter(r => r.subvariety === currentSubvariety);
   if (currentSize       !== '__ALL__') rows = rows.filter(r => r.size === currentSize);
+  // Filtros adicionales (market y variety) si existen los selectores
+  const mktSel = document.getElementById('marketSelect');
+  const varSel = document.getElementById('varietySelect');
+  if (mktSel && mktSel.value !== '__ALL__') rows = rows.filter(r => r.market === mktSel.value);
+  if (varSel && varSel.value !== '__ALL__') rows = rows.filter(r => r.variety === varSel.value);
   return rows;
 }
 
@@ -2402,10 +2475,56 @@ new Chart(ctxSZ, {
   }
 });
 
+// ============================================================
+// TOGGLE SECCIONES — ocultar/mostrar con botón
+// ============================================================
+function toggleSection(id, btn) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  const hidden = el.style.display === 'none';
+  el.style.display = hidden ? '' : 'none';
+  btn.textContent  = hidden ? 'Ocultar' : 'Mostrar';
+  btn.classList.toggle('hidden-state', !hidden);
+}
+
+// ============================================================
+// FOOTER DINÁMICO — se actualiza con los datos reales
+// ============================================================
+function _updateFooter() {
+  const el = document.getElementById('footerOutlook');
+  if (!el || RAW_DATA.length === 0) return;
+  const total    = RAW_DATA.reduce((s,r) => s + r.volume, 0);
+  const clients  = [...new Set(RAW_DATA.map(r => r.client))];
+  const markets  = [...new Set(RAW_DATA.map(r => r.market))];
+  const varieties= [...new Set(RAW_DATA.map(r => r.variety).filter(Boolean))];
+  const pws      = RAW_DATA.map(r => r.packWeek).filter(Boolean);
+  const minPW    = pws.length ? Math.min(...pws) : '—';
+  const maxPW    = pws.length ? Math.max(...pws) : '—';
+  const mktVols  = {};
+  RAW_DATA.forEach(r => { mktVols[r.market] = (mktVols[r.market]||0) + r.volume; });
+  const topMkt   = Object.entries(mktVols).sort((a,b)=>b[1]-a[1])[0];
+  const topMktPct= topMkt ? (topMkt[1]/total*100).toFixed(0) : 0;
+  const pwMap    = {};
+  RAW_DATA.forEach(r => { pwMap[r.packWeek] = (pwMap[r.packWeek]||0) + r.volume; });
+  const peakPW   = Object.entries(pwMap).sort((a,b)=>b[1]-a[1])[0];
+  const peakPct  = peakPW ? (peakPW[1]/total*100).toFixed(0) : 0;
+  const lastUpd  = RAW_DATA.find(r => r.lastUpdate)?.lastUpdate || '';
+  const lastUpdFmt = lastUpd ? new Date(lastUpd).toLocaleDateString('es-ES', {day:'2-digit',month:'short',year:'numeric'}) : '—';
+
+  el.innerHTML = `Client Demand Plan 2026: W${minPW}–W${maxPW} · Total ${total.toLocaleString()} pallets · ${markets.length} markets · ${clients.length} clients · ${varieties.join(', ')}.<br>
+    ${topMkt ? topMkt[0]+' leads ('+topMktPct+'%)' : ''}. ${peakPW ? 'W'+peakPW[0]+' peak ('+peakPct+'%)' : ''}. FOB/TON data available. Status tracking active. · Última actualización: ${lastUpdFmt}`;
+}
+
+// ============================================================
+// HEADER DINÁMICO — actualiza "Last Update" desde datos reales
+// ============================================================
+const _origUpdateHeader = typeof updateHeader === 'function' ? updateHeader : null;
+
 // ─── Init dynamic engine after static charts are built ───
 window.addEventListener("load", async function() {
   await loadFromSheet();
   initDynamic();
+  _updateFooter();
 });
 </script>
 </body>
